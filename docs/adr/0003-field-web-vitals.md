@@ -41,6 +41,13 @@ Timing): event type, target element, start time since navigation, and the
 input delay / processing / presentation split. The API rebuilds this object field by
 field with bounded values. `pnpm vitals:report` lists the slowest interactions.
 
+Second report: one 720 ms INP stored six times, because web-vitals re-reports a
+metric on every `visibilitychange` to hidden. Fixed with `metricId`: the client skips
+unchanged repeats and the report keeps the latest row per `metricId`. The interaction
+itself was input delay 18 + processing 0 + presentation 702 ms, so attribution now also
+includes every event of the interaction and the overlapping Long Animation Frames with
+their top scripts, to see what kept the next frame from being painted.
+
 ## Consequences
 
 - No third-party script; client JS did not measurably grow (web-vitals already ships
