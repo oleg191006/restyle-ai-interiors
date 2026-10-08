@@ -71,3 +71,32 @@ model IdeaPage {
   @@unique([roomId, styleId, locale])
   @@index([locale, published])
 }
+
+enum VitalName {
+  LCP
+  INP
+  CLS
+  FCP
+  TTFB
+}
+
+enum FormFactor {
+  mobile
+  desktop
+}
+
+/// One Core Web Vitals sample from a real visitor (RUM). Lab runs and bots are dropped
+/// by the API, so this table is field data only. Reported as p75 per route and metric.
+model WebVital {
+  id         BigInt     @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  name       VitalName
+  value      Float // ms, except CLS (unitless)
+  rating     String // good | needs-improvement | poor, as computed by web-vitals
+  route      String // route template, e.g. /[locale]/ideas/[room]/[style]
+  path       String // concrete URL path, for drilling into a single page
+  navigation String // navigate | reload | back-forward | ...
+  formFactor FormFactor
+
+  @@index([name, route, createdAt])
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { WebVitals } from "@/components/web-vitals";
 import { getDictionary, hasLocale, locales, paths, siteUrl } from "@/lib/i18n";
 import "../globals.css";
 
@@ -35,6 +36,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html lang={locale} className="h-full antialiased">
       <body className="flex min-h-full flex-col font-sans">
+        <WebVitals />
         <header className="border-b border-line">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
             <Link href={paths.home(locale)} className="text-lg font-semibold tracking-tight">

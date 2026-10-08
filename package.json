@@ -9,7 +9,8 @@
     "db:up": "docker compose up -d db",
     "db:migrate": "pnpm --filter @restyle/db migrate",
     "db:seed": "pnpm --filter @restyle/db seed",
-    "lhci": "lhci autorun"
+    "lhci": "lhci autorun",
+    "vitals:report": "pnpm --filter @restyle/db vitals:report"
   },
   "devDependencies": {
     "@lhci/cli": "0.15.1"
