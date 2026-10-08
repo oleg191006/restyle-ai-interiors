@@ -39,6 +39,24 @@ const dictionaries = {
     ideasLead: "Оберіть кімнату, щоб побачити 15 стилів з палітрами, матеріалами й порадами.",
     stylesTitle: "Стилі інтер'єру",
     stylesLead: "Палітра, матеріали й характер кожного стилю — і як він виглядає в різних кімнатах.",
+    toolTitle: "Редизайн кімнати за фото",
+    toolLead: "Завантажте фото кімнати й оберіть стиль. AI збереже планування й замінить меблі, оздоблення й кольори.",
+    toolPhoto: "Фото кімнати",
+    toolPhotoHint: "JPG, PNG або HEIC з телефона. Фото зменшується у вашому браузері, дані про місце зйомки видаляються.",
+    toolRoom: "Кімната",
+    toolStyle: "Стиль",
+    toolSubmit: "Згенерувати",
+    toolUploading: "Завантажуємо фото…",
+    toolQueued: "У черзі…",
+    toolRunning: "Генеруємо редизайн…",
+    toolBefore: "До",
+    toolAfter: "Після",
+    toolAgain: "Спробувати інший стиль",
+    toolErrorGeneric: "Не вдалося згенерувати. Спробуйте ще раз.",
+    toolErrorLimitVisitor: "Ви використали всі безкоштовні генерації на сьогодні. Повертайтесь завтра.",
+    toolErrorLimitGlobal: "Сьогодні забагато охочих: денний ліміт сайту вичерпано. Спробуйте завтра.",
+    toolErrorImage: "Не вдалося прочитати фото. Спробуйте інший файл.",
+    toolPrivacy: "Фото зберігається 7 днів, потім видаляється автоматично.",
   },
   en: {
     siteName: "Restyle",
@@ -62,6 +80,24 @@ const dictionaries = {
     ideasLead: "Pick a room to see 15 styles with palettes, materials and tips.",
     stylesTitle: "Interior design styles",
     stylesLead: "The palette, materials and character of each style, and how it looks in different rooms.",
+    toolTitle: "Redesign your room from a photo",
+    toolLead: "Upload a photo of your room and pick a style. The AI keeps the layout and replaces furniture, finishes and colours.",
+    toolPhoto: "Room photo",
+    toolPhotoHint: "JPG, PNG or HEIC from your phone. The photo is resized in your browser and location data is removed.",
+    toolRoom: "Room",
+    toolStyle: "Style",
+    toolSubmit: "Generate",
+    toolUploading: "Uploading photo…",
+    toolQueued: "Queued…",
+    toolRunning: "Generating the redesign…",
+    toolBefore: "Before",
+    toolAfter: "After",
+    toolAgain: "Try another style",
+    toolErrorGeneric: "Generation failed. Please try again.",
+    toolErrorLimitVisitor: "You have used all free generations for today. Come back tomorrow.",
+    toolErrorLimitGlobal: "Too many people today: the site daily limit is reached. Please try tomorrow.",
+    toolErrorImage: "Could not read the photo. Try another file.",
+    toolPrivacy: "Photos are kept for 7 days, then deleted automatically.",
   },
 } satisfies Record<Locale, Record<string, string>>;
 
@@ -75,6 +111,10 @@ export const paths = {
   room: (l: Locale, room: string) => `/${l}/ideas/${room}`,
   style: (l: Locale, style: string) => `/${l}/styles/${style}`,
   idea: (l: Locale, room: string, style: string) => `/${l}/ideas/${room}/${style}`,
+  redesign: (l: Locale, room?: string, style?: string) => {
+    const q = new URLSearchParams({ ...(room && { room }), ...(style && { style }) }).toString();
+    return `/${l}/redesign${q ? `?${q}` : ""}`;
+  },
 };
 
 /** `alternates` block for generateMetadata: canonical + hreflang for every locale + x-default. */
