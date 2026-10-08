@@ -97,6 +97,9 @@ model WebVital {
   path       String // concrete URL path, for drilling into a single page
   navigation String // navigate | reload | back-forward | ...
   formFactor FormFactor
+  /// INP only: what was interacted with and where the time went
+  /// { event, target, startTime, inputDelay, processing, presentation }
+  attribution Json?
 
   @@index([name, route, createdAt])
 }

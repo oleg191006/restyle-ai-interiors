@@ -47,4 +47,38 @@ async function main() {
   );
 }
 
-main().finally(() => prisma.$disconnect());
+type Interaction = { value: number; path: string; formFactor: string; navigation: string; attribution: Record<string, unknown> | null };
+
+async function worstInteractions() {
+  const rows = await prisma.$queryRaw<Interaction[]>`
+    SELECT value, path, "formFactor"::text AS "formFactor", navigation, attribution
+    FROM "WebVital"
+    WHERE name = 'INP' AND "createdAt" > now() - make_interval(days => ${days})
+    ORDER BY value DESC
+    LIMIT 10`;
+  if (rows.length === 0) return;
+
+  // The biggest of the three phases says where to look: input delay = main thread busy
+  // (hydration, long tasks), processing = slow handlers, presentation = heavy re-render.
+  console.log("\nSlowest interactions (INP) and where the time went\n");
+  console.table(
+    rows.map((r) => {
+      const a = r.attribution ?? {};
+      return {
+        INP: `${Math.round(r.value)} ms`,
+        path: r.path,
+        device: r.formFactor,
+        event: a.event ?? "–",
+        target: a.target ?? "(no attribution)",
+        "at (ms)": a.startTime ?? "–",
+        "input delay": a.inputDelay ?? "–",
+        processing: a.processing ?? "–",
+        presentation: a.presentation ?? "–",
+      };
+    }),
+  );
+}
+
+main()
+  .then(worstInteractions)
+  .finally(() => prisma.$disconnect());
