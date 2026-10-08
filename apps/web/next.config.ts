@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   // The db package ships TypeScript source; let Next compile it.
   transpilePackages: ["@restyle/db"],
   serverExternalPackages: ["pg"],
+  // OG images read these at runtime for pages rendered after the build.
+  outputFileTracingIncludes: {
+    "/*": ["./assets/fonts/*.ttf"],
+  },
   turbopack: {
     rules: {
       "*.css": {
