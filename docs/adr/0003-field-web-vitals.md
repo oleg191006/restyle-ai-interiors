@@ -55,6 +55,14 @@ The 2992 ms interaction (presentation 2975 ms, no long animation frames) did not
 reproduce in emulation (early tap, long press, slow network to an uncached page,
 language switch: all under 120 ms), so it is device- or browser-specific.
 
+All production samples so far came from an iPhone 15 on Safari. Safari only exposes
+Event Timing since 26.2 (December 2025), its INP is reported to be inflated by bugs,
+and it has no Long Animation Frames, which is why no frame data arrived. CrUX, the field
+data Google ranks on, is Chrome-only and excludes iOS entirely. Samples now carry a coarse
+`browser` family (chrome, edge, firefox, safari, ios, other) and the report computes p75
+per browser, so iOS numbers are visible but never mixed into the Chrome figures that
+matter for search.
+
 ## Consequences
 
 - No third-party script; client JS did not measurably grow (web-vitals already ships
