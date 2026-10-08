@@ -8,7 +8,13 @@ export const hasLocale = (value: string): value is Locale =>
 // hreflang codes for <link rel="alternate">; uk-UA so Google maps it to Ukraine searches.
 export const hreflang: Record<Locale, string> = { uk: "uk-UA", en: "en" };
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Absolute base for canonical, hreflang and sitemap URLs. On Vercel, falls back to the
+// production domain so preview builds never emit localhost.
+export const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
 
 const dictionaries = {
   uk: {
