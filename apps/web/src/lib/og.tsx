@@ -33,7 +33,7 @@ export async function renderOgImage({
   title,
   palette = brandPalette,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   palette?: string[];
 }) {
@@ -54,7 +54,7 @@ export async function renderOgImage({
       >
         <div style={{ display: "flex", fontSize: 34, fontWeight: 700 }}>Restyle</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", fontSize: 30, color: colors.accent }}>{eyebrow}</div>
+          {eyebrow && <div style={{ display: "flex", fontSize: 30, color: colors.accent }}>{eyebrow}</div>}
           <div style={{ display: "flex", fontSize: 68, fontWeight: 700, lineHeight: 1.1, maxWidth: 1000 }}>
             {title}
           </div>

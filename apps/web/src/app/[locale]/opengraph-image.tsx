@@ -13,5 +13,5 @@ export function generateStaticParams() {
 export default async function Image({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = getDictionary(hasLocale(locale) ? locale : "uk");
-  return renderOgImage({ eyebrow: t.siteName, title: t.tagline });
+  return renderOgImage({ title: t.tagline });
 }

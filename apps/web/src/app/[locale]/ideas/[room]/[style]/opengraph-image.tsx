@@ -23,6 +23,6 @@ export default async function Image({
     getRoom(locale, roomSlug),
     getStyle(locale, styleSlug),
   ]);
-  if (!page || !room || !style) return renderOgImage({ eyebrow: "Restyle", title: getDictionary(locale).tagline });
+  if (!page || !room || !style) return renderOgImage({ title: getDictionary(locale).tagline });
   return renderOgImage({ eyebrow: `${room.name} · ${style.name}`, title: page.title, palette: style.palette });
 }
