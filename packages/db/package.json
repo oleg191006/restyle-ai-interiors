@@ -1,0 +1,27 @@
+{
+  "name": "@restyle/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./seed-data": "./src/seed-data.ts"
+  },
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "seed": "tsx src/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "dotenv": "^17",
+    "prisma": "7.10.0",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}

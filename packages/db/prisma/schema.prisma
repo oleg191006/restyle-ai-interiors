@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Locale {
+  uk
+  en
+}
+
+model Room {
+  id           Int               @id @default(autoincrement())
+  slug         String            @unique
+  priority     Int               @default(0)
+  translations RoomTranslation[]
+  pages        IdeaPage[]
+  updatedAt    DateTime          @updatedAt
+}
+
+model RoomTranslation {
+  roomId Int
+  locale Locale
+  name   String
+  intro  String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@id([roomId, locale])
+}
+
+model Style {
+  id           Int                @id @default(autoincrement())
+  slug         String             @unique
+  priority     Int                @default(0)
+  palette      String[]
+  translations StyleTranslation[]
+  pages        IdeaPage[]
+  updatedAt    DateTime           @updatedAt
+}
+
+model StyleTranslation {
+  styleId   Int
+  locale    Locale
+  name      String
+  summary   String
+  materials String[]
+  style     Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@id([styleId, locale])
+}
+
+/// One programmatic landing page: room × style × locale.
+/// A row exists only when the combination has enough unique content to be indexable.
+model IdeaPage {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  styleId   Int
+  locale    Locale
+  title     String
+  lead      String
+  tips      String[]
+  faq       Json // [{ q: string, a: string }]
+  published Boolean  @default(true)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  style     Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @updatedAt
+
+  @@unique([roomId, styleId, locale])
+  @@index([locale, published])
+}
