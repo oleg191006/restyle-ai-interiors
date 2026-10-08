@@ -4,15 +4,21 @@ import { useEffect } from "react";
 import { useReportWebVitals } from "next/web-vitals";
 
 type Metric = Parameters<Parameters<typeof useReportWebVitals>[0]>[0];
+
+// Long Animation Frames API (Chrome 123+). Not in TypeScript's DOM lib yet.
+type LoafScript = { duration: number; invoker: string; sourceURL: string; sourceFunctionName: string };
+type Loaf = PerformanceEntry & { renderStart: number; blockingDuration: number; scripts: LoafScript[] };
+
+type EventPhase = { event: string; duration: number; inputDelay: number; processing: number; presentation: number };
+type FrameSummary = { duration: number; blocking: number; render: number; scripts: { source: string; duration: number }[] };
 type InpAttribution = {
-  event: string;
   target: string;
   startTime: number; // ms since navigation start: an early tap may be waiting on hydration
-  inputDelay: number; // main thread busy before handlers could run
-  processing: number; // event handlers themselves
-  presentation: number; // rendering the next frame after handlers
+  events: EventPhase[]; // pointerdown / pointerup / click of the same interaction
+  frames: FrameSummary[]; // long animation frames overlapping the interaction
 };
 type Sample = {
+  id: string;
   name: string;
   value: number;
   rating: string;
@@ -25,6 +31,16 @@ type Sample = {
 // so they are queued and flushed in one beacon instead of one request per metric.
 const queue: Sample[] = [];
 const MAX_BATCH = 20;
+// web-vitals re-reports a metric every time the page is hidden; skip unchanged repeats.
+const lastSent = new Map<string, number>();
+const loafs: Loaf[] = [];
+
+if (typeof PerformanceObserver !== "undefined" && PerformanceObserver.supportedEntryTypes?.includes("long-animation-frame")) {
+  new PerformanceObserver((list) => {
+    loafs.push(...(list.getEntries() as Loaf[]));
+    if (loafs.length > 50) loafs.splice(0, loafs.length - 50);
+  }).observe({ type: "long-animation-frame", buffered: true });
+}
 
 function flush() {
   if (queue.length === 0) return;
@@ -48,25 +64,52 @@ function describe(el: Node | null) {
   return `${el.tagName.toLowerCase()}${href ? `[href=${href}]` : el.id ? `#${el.id}` : ""}`.slice(0, 100);
 }
 
-// INP is the slowest interaction; split its entry into the three phases so field data
-// says where to look instead of leaving us to guess.
+function shortSource(s: LoafScript) {
+  const file = s.sourceURL.split("/").pop()?.split("?")[0] || "(inline)";
+  return `${s.invoker} ${file}${s.sourceFunctionName ? `:${s.sourceFunctionName}` : ""}`.slice(0, 100);
+}
+
+// INP is the slowest interaction. Record each of its events split into the three phases,
+// plus the long animation frames that overlapped it: they show which scripts or how much
+// rendering kept the next frame from being painted.
 function inpAttribution(metric: Metric): InpAttribution | undefined {
-  const entries = metric.entries as PerformanceEventTiming[];
-  const e = entries.reduce<PerformanceEventTiming | undefined>((a, b) => (!a || b.duration > a.duration ? b : a), undefined);
-  if (!e) return;
+  const entries = (metric.entries as PerformanceEventTiming[]).slice().sort((a, b) => a.startTime - b.startTime);
+  if (entries.length === 0) return;
+  const start = entries[0].startTime;
+  const end = Math.max(...entries.map((e) => e.startTime + e.duration));
+  const r = Math.round;
   return {
-    event: e.name,
-    target: describe(e.target),
-    startTime: Math.round(e.startTime),
-    inputDelay: Math.round(e.processingStart - e.startTime),
-    processing: Math.round(e.processingEnd - e.processingStart),
-    presentation: Math.round(e.startTime + e.duration - e.processingEnd),
+    target: describe(entries.find((e) => e.target)?.target ?? null),
+    startTime: r(start),
+    events: entries.slice(0, 5).map((e) => ({
+      event: e.name,
+      duration: r(e.duration),
+      inputDelay: r(e.processingStart - e.startTime),
+      processing: r(e.processingEnd - e.processingStart),
+      presentation: r(e.startTime + e.duration - e.processingEnd),
+    })),
+    frames: loafs
+      .filter((f) => f.startTime < end && f.startTime + f.duration > start)
+      .slice(0, 3)
+      .map((f) => ({
+        duration: r(f.duration),
+        blocking: r(f.blockingDuration),
+        render: r(f.startTime + f.duration - f.renderStart), // style, layout and paint at the end of the frame
+        scripts: f.scripts
+          .slice()
+          .sort((a, b) => b.duration - a.duration)
+          .slice(0, 3)
+          .map((s) => ({ source: shortSource(s), duration: r(s.duration) })),
+      })),
   };
 }
 
 // Stable function reference: a new one per render would re-report metrics.
 function report(metric: Metric) {
+  if (lastSent.get(metric.id) === metric.value) return;
+  lastSent.set(metric.id, metric.value);
   queue.push({
+    id: metric.id,
     name: metric.name,
     value: metric.value,
     rating: metric.rating,

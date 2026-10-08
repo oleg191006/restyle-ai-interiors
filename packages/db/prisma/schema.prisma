@@ -89,6 +89,9 @@ enum FormFactor {
 /// by the API, so this table is field data only. Reported as p75 per route and metric.
 model WebVital {
   id         BigInt     @id @default(autoincrement())
+  /// web-vitals metric id; the same metric is re-reported each time the page is hidden,
+  /// so reports keep only the latest row per metricId
+  metricId   String?
   createdAt  DateTime   @default(now())
   name       VitalName
   value      Float // ms, except CLS (unitless)

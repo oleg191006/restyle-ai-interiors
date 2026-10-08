@@ -13,21 +13,29 @@ const thresholds: Record<string, [good: number, poor: number]> = {
   TTFB: [800, 1800],
 };
 
+// web-vitals re-reports a metric each time the page is hidden, so both queries keep the
+// latest row per metricId. Rows from before metricId existed have none and count individually.
+
 type Row = { route: string; formFactor: string; name: string; p75: number; samples: bigint };
 
-async function main() {
+async function summary() {
   const rows = await prisma.$queryRaw<Row[]>`
+    WITH dedup AS (
+      SELECT DISTINCT ON (COALESCE("metricId", id::text)) *
+      FROM "WebVital"
+      WHERE "createdAt" > now() - make_interval(days => ${days})
+      ORDER BY COALESCE("metricId", id::text), "createdAt" DESC
+    )
     SELECT route, "formFactor"::text AS "formFactor", name::text AS name,
            percentile_cont(0.75) WITHIN GROUP (ORDER BY value) AS p75,
            count(*) AS samples
-    FROM "WebVital"
-    WHERE "createdAt" > now() - make_interval(days => ${days})
+    FROM dedup
     GROUP BY route, "formFactor", name
     ORDER BY route, "formFactor", name`;
 
   if (rows.length === 0) {
     console.log(`No samples in the last ${days} days.`);
-    return;
+    return false;
   }
 
   console.log(`Field Core Web Vitals, p75, last ${days} days\n`);
@@ -45,40 +53,48 @@ async function main() {
       };
     }),
   );
+  return true;
 }
 
-type Interaction = { value: number; path: string; formFactor: string; navigation: string; attribution: Record<string, unknown> | null };
+type Phase = { event: string; duration: number; inputDelay: number; processing: number; presentation: number };
+type Frame = { duration: number; blocking: number; render: number; scripts: { source: string; duration: number }[] };
+type Attribution = { target?: string; startTime?: number; events?: Phase[]; frames?: Frame[]; event?: string } & Partial<Phase>;
+type Interaction = { value: number; path: string; formFactor: string; createdAt: Date; attribution: Attribution | null };
 
 async function worstInteractions() {
   const rows = await prisma.$queryRaw<Interaction[]>`
-    SELECT value, path, "formFactor"::text AS "formFactor", navigation, attribution
+    SELECT DISTINCT ON (COALESCE("metricId", id::text))
+           value, path, "formFactor"::text AS "formFactor", "createdAt", attribution
     FROM "WebVital"
     WHERE name = 'INP' AND "createdAt" > now() - make_interval(days => ${days})
-    ORDER BY value DESC
-    LIMIT 10`;
+    ORDER BY COALESCE("metricId", id::text), "createdAt" DESC`;
   if (rows.length === 0) return;
 
-  // The biggest of the three phases says where to look: input delay = main thread busy
-  // (hydration, long tasks), processing = slow handlers, presentation = heavy re-render.
-  console.log("\nSlowest interactions (INP) and where the time went\n");
-  console.table(
-    rows.map((r) => {
-      const a = r.attribution ?? {};
-      return {
-        INP: `${Math.round(r.value)} ms`,
-        path: r.path,
-        device: r.formFactor,
-        event: a.event ?? "–",
-        target: a.target ?? "(no attribution)",
-        "at (ms)": a.startTime ?? "–",
-        "input delay": a.inputDelay ?? "–",
-        processing: a.processing ?? "–",
-        presentation: a.presentation ?? "–",
-      };
-    }),
-  );
+  // The biggest phase says where to look: input delay = main thread busy (hydration,
+  // long tasks), processing = slow handlers, presentation = rendering the next frame.
+  console.log("\nSlowest interactions (INP)\n");
+  for (const r of rows.sort((a, b) => b.value - a.value).slice(0, 5)) {
+    const a = r.attribution ?? {};
+    console.log(
+      `${Math.round(r.value)} ms  ${r.formFactor}  ${r.path}  → ${a.target ?? "(no attribution)"}` +
+        (a.startTime !== undefined ? `  at ${a.startTime} ms` : "") +
+        `  (${r.createdAt.toISOString().slice(0, 16)})`,
+    );
+    // Older rows stored a single event flat on the object.
+    const events = a.events ?? (a.event ? [{ ...(a as Phase), event: a.event }] : []);
+    for (const e of events) {
+      console.log(
+        `    ${e.event.padEnd(12)} ${String(e.duration).padStart(5)} ms = input delay ${e.inputDelay} + processing ${e.processing} + presentation ${e.presentation}`,
+      );
+    }
+    for (const f of a.frames ?? []) {
+      console.log(`    long frame ${f.duration} ms (blocking ${f.blocking}, render ${f.render})`);
+      for (const s of f.scripts) console.log(`      script ${s.duration} ms  ${s.source}`);
+    }
+    if (a.events && !a.frames?.length) console.log("    no long animation frames overlapped (or browser lacks LoAF)");
+  }
 }
 
-main()
-  .then(worstInteractions)
+summary()
+  .then((hasData) => (hasData ? worstInteractions() : undefined))
   .finally(() => prisma.$disconnect());

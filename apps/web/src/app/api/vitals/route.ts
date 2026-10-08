@@ -12,17 +12,35 @@ const MAX_VALUE = 120_000; // anything above 2 min is a broken measurement
 const ms = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? Math.min(Math.max(Math.round(v), 0), MAX_VALUE) : 0);
 const text = (v: unknown) => (typeof v === "string" ? v.slice(0, 100) : "");
 
-/** Rebuilt field by field: only known keys and bounded values reach the database. */
+const list = (v: unknown, max: number) => (Array.isArray(v) ? v.slice(0, max) : []);
+const obj = (v: unknown) => (typeof v === "object" && v !== null ? (v as Record<string, unknown>) : {});
+
+/** Rebuilt field by field: only known keys, bounded arrays and bounded values reach the database. */
 function inpAttribution(a: unknown) {
   if (typeof a !== "object" || a === null) return undefined;
-  const r = a as Record<string, unknown>;
+  const r = obj(a);
   return {
-    event: text(r.event),
     target: text(r.target),
     startTime: ms(r.startTime),
-    inputDelay: ms(r.inputDelay),
-    processing: ms(r.processing),
-    presentation: ms(r.presentation),
+    events: list(r.events, 5).map((e) => {
+      const x = obj(e);
+      return {
+        event: text(x.event),
+        duration: ms(x.duration),
+        inputDelay: ms(x.inputDelay),
+        processing: ms(x.processing),
+        presentation: ms(x.presentation),
+      };
+    }),
+    frames: list(r.frames, 3).map((f) => {
+      const x = obj(f);
+      return {
+        duration: ms(x.duration),
+        blocking: ms(x.blocking),
+        render: ms(x.render),
+        scripts: list(x.scripts, 3).map((s) => ({ source: text(obj(s).source), duration: ms(obj(s).duration) })),
+      };
+    }),
   };
 }
 
@@ -59,6 +77,7 @@ export async function POST(request: Request) {
         s.navigation.length <= 30,
     )
     .map((s) => ({
+      metricId: text((s as { id?: unknown }).id) || null,
       name: s.name,
       value: s.value,
       rating: s.rating,
