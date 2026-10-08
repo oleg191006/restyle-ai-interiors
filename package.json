@@ -1,0 +1,13 @@
+{
+  "name": "restyle",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm -r lint",
+    "db:up": "docker compose up -d db",
+    "db:migrate": "pnpm --filter @restyle/db migrate",
+    "db:seed": "pnpm --filter @restyle/db seed"
+  }
+}
