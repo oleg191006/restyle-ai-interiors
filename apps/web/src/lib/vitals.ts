@@ -7,3 +7,16 @@ export function routeTemplate(path: string) {
   if (section === "styles" && a) return "/[locale]/styles/[style]";
   return "/other";
 }
+
+/**
+ * Coarse browser family from the user agent. Every iOS browser runs on WebKit, so they share
+ * one bucket. Only "chrome" feeds CrUX, the field data Google uses for ranking.
+ */
+export function browserOf(ua: string) {
+  if (/iPhone|iPad|iPod/.test(ua)) return "ios";
+  if (/Edg\//.test(ua)) return "edge";
+  if (/Firefox\//.test(ua)) return "firefox";
+  if (/Chrome\//.test(ua)) return "chrome";
+  if (/Safari\//.test(ua)) return "safari";
+  return "other";
+}

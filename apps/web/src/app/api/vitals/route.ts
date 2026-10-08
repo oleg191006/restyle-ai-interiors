@@ -1,5 +1,5 @@
 import { prisma, type FormFactor, type VitalName } from "@restyle/db";
-import { routeTemplate } from "@/lib/vitals";
+import { browserOf, routeTemplate } from "@/lib/vitals";
 
 // Field data only: lab runs (Lighthouse, PSI, headless Chrome) and crawlers would skew p75.
 const nonHuman = /bot|crawl|spider|lighthouse|headlesschrome|chrome-lighthouse|pagespeed/i;
@@ -45,7 +45,9 @@ function inpAttribution(a: unknown) {
 }
 
 export async function POST(request: Request) {
-  if (nonHuman.test(request.headers.get("user-agent") ?? "")) return new Response(null, { status: 204 });
+  const ua = request.headers.get("user-agent") ?? "";
+  if (nonHuman.test(ua)) return new Response(null, { status: 204 });
+  const browser = browserOf(ua);
 
   let body: unknown;
   try {
@@ -85,6 +87,7 @@ export async function POST(request: Request) {
       route: routeTemplate(s.path),
       navigation: s.navigation,
       formFactor: formFactor as FormFactor,
+      browser,
       attribution: s.name === "INP" ? inpAttribution((s as { attribution?: unknown }).attribution) : undefined,
     }));
 

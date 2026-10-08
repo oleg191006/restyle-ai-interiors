@@ -16,7 +16,7 @@ const thresholds: Record<string, [good: number, poor: number]> = {
 // web-vitals re-reports a metric each time the page is hidden, so both queries keep the
 // latest row per metricId. Rows from before metricId existed have none and count individually.
 
-type Row = { route: string; formFactor: string; name: string; p75: number; samples: bigint };
+type Row = { route: string; formFactor: string; browser: string; name: string; p75: number; samples: bigint };
 
 async function summary() {
   const rows = await prisma.$queryRaw<Row[]>`
@@ -26,19 +26,20 @@ async function summary() {
       WHERE "createdAt" > now() - make_interval(days => ${days})
       ORDER BY COALESCE("metricId", id::text), "createdAt" DESC
     )
-    SELECT route, "formFactor"::text AS "formFactor", name::text AS name,
+    SELECT route, "formFactor"::text AS "formFactor", browser, name::text AS name,
            percentile_cont(0.75) WITHIN GROUP (ORDER BY value) AS p75,
            count(*) AS samples
     FROM dedup
-    GROUP BY route, "formFactor", name
-    ORDER BY route, "formFactor", name`;
+    GROUP BY route, "formFactor", browser, name
+    ORDER BY route, "formFactor", browser, name`;
 
   if (rows.length === 0) {
     console.log(`No samples in the last ${days} days.`);
     return false;
   }
 
-  console.log(`Field Core Web Vitals, p75, last ${days} days\n`);
+  console.log(`Field Core Web Vitals, p75, last ${days} days`);
+  console.log("Only browser = chrome feeds CrUX, the data Google ranks on; iOS and Safari never do.\n");
   console.table(
     rows.map((r) => {
       const [good, poor] = thresholds[r.name];
@@ -46,6 +47,7 @@ async function summary() {
       return {
         route: r.route,
         device: r.formFactor,
+        browser: r.browser,
         metric: r.name,
         p75: r.name === "CLS" ? r.p75.toFixed(3) : `${Math.round(r.p75)} ms`,
         rating,
@@ -59,12 +61,12 @@ async function summary() {
 type Phase = { event: string; duration: number; inputDelay: number; processing: number; presentation: number };
 type Frame = { duration: number; blocking: number; render: number; scripts: { source: string; duration: number }[] };
 type Attribution = { target?: string; startTime?: number; events?: Phase[]; frames?: Frame[]; event?: string } & Partial<Phase>;
-type Interaction = { value: number; path: string; formFactor: string; createdAt: Date; attribution: Attribution | null };
+type Interaction = { value: number; path: string; formFactor: string; browser: string; createdAt: Date; attribution: Attribution | null };
 
 async function worstInteractions() {
   const rows = await prisma.$queryRaw<Interaction[]>`
     SELECT DISTINCT ON (COALESCE("metricId", id::text))
-           value, path, "formFactor"::text AS "formFactor", "createdAt", attribution
+           value, path, "formFactor"::text AS "formFactor", browser, "createdAt", attribution
     FROM "WebVital"
     WHERE name = 'INP' AND "createdAt" > now() - make_interval(days => ${days})
     ORDER BY COALESCE("metricId", id::text), "createdAt" DESC`;
@@ -76,7 +78,7 @@ async function worstInteractions() {
   for (const r of rows.sort((a, b) => b.value - a.value).slice(0, 5)) {
     const a = r.attribution ?? {};
     console.log(
-      `${Math.round(r.value)} ms  ${r.formFactor}  ${r.path}  → ${a.target ?? "(no attribution)"}` +
+      `${Math.round(r.value)} ms  ${r.formFactor}/${r.browser}  ${r.path}  → ${a.target ?? "(no attribution)"}` +
         (a.startTime !== undefined ? `  at ${a.startTime} ms` : "") +
         `  (${r.createdAt.toISOString().slice(0, 16)})`,
     );
@@ -91,7 +93,9 @@ async function worstInteractions() {
       console.log(`    long frame ${f.duration} ms (blocking ${f.blocking}, render ${f.render})`);
       for (const s of f.scripts) console.log(`      script ${s.duration} ms  ${s.source}`);
     }
-    if (a.events && !a.frames?.length) console.log("    no long animation frames overlapped (or browser lacks LoAF)");
+    if (a.events && !a.frames?.length) {
+      console.log(r.browser === "chrome" || r.browser === "edge" ? "    no long animation frames overlapped" : "    no frame data: this browser does not support Long Animation Frames");
+    }
   }
 }
 

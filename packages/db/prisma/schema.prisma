@@ -100,6 +100,9 @@ model WebVital {
   path       String // concrete URL path, for drilling into a single page
   navigation String // navigate | reload | back-forward | ...
   formFactor FormFactor
+  /// Coarse browser family. Google ranks on CrUX (Chrome only, no iOS), and Safari measures
+  /// INP differently, so reports keep browsers apart: chrome | edge | firefox | safari | ios | other
+  browser    String     @default("other")
   /// INP only: what was interacted with and where the time went
   /// { event, target, startTime, inputDelay, processing, presentation }
   attribution Json?
