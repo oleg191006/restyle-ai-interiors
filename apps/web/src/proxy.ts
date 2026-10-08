@@ -14,6 +14,15 @@ function preferredLocale(request: NextRequest): Locale {
 // so landing pages stay cacheable.
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // All our URLs are lowercase. Fold any other casing into one canonical URL with a
+  // permanent redirect instead of serving duplicates or 404s (e.g. /UK/ideas/Kitchen).
+  if (pathname !== pathname.toLowerCase()) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.toLowerCase();
+    return NextResponse.redirect(url, 308);
+  }
+
   const first = pathname.split("/")[1];
   if (locales.some((l) => l === first)) return;
 

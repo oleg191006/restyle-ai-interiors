@@ -35,6 +35,10 @@ const dictionaries = {
     otherRooms: "Цей стиль в інших кімнатах",
     home: "Головна",
     ideas: "Ідеї",
+    ideasTitle: "Ідеї інтер'єру для кожної кімнати",
+    ideasLead: "Оберіть кімнату, щоб побачити 15 стилів з палітрами, матеріалами й порадами.",
+    stylesTitle: "Стилі інтер'єру",
+    stylesLead: "Палітра, матеріали й характер кожного стилю — і як він виглядає в різних кімнатах.",
   },
   en: {
     siteName: "Restyle",
@@ -54,6 +58,10 @@ const dictionaries = {
     otherRooms: "This style in other rooms",
     home: "Home",
     ideas: "Ideas",
+    ideasTitle: "Interior ideas for every room",
+    ideasLead: "Pick a room to see 15 styles with palettes, materials and tips.",
+    stylesTitle: "Interior design styles",
+    stylesLead: "The palette, materials and character of each style, and how it looks in different rooms.",
   },
 } satisfies Record<Locale, Record<string, string>>;
 
@@ -62,6 +70,8 @@ export const getDictionary = (locale: Locale): Dictionary => dictionaries[locale
 
 export const paths = {
   home: (l: Locale) => `/${l}`,
+  ideas: (l: Locale) => `/${l}/ideas`,
+  styles: (l: Locale) => `/${l}/styles`,
   room: (l: Locale, room: string) => `/${l}/ideas/${room}`,
   style: (l: Locale, style: string) => `/${l}/styles/${style}`,
   idea: (l: Locale, room: string, style: string) => `/${l}/ideas/${room}/${style}`,

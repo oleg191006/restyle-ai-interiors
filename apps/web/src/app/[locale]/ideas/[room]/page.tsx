@@ -38,6 +38,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
       <Breadcrumbs
         items={[
           { name: t.home, href: paths.home(locale) },
+          { name: t.ideas, href: paths.ideas(locale) },
           { name: room.name, href: paths.room(locale, slug) },
         ]}
       />

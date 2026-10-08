@@ -46,6 +46,7 @@ export default async function IdeaPage({ params }: Props) {
       <Breadcrumbs
         items={[
           { name: t.home, href: paths.home(locale) },
+          { name: t.ideas, href: paths.ideas(locale) },
           { name: room.name, href: paths.room(locale, roomSlug) },
           { name: style.name, href: paths.idea(locale, roomSlug, styleSlug) },
         ]}

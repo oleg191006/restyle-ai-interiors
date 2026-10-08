@@ -23,6 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
   for (const l of locales) {
     entries.push({ url: abs(paths.home(l)), alternates: { languages: languages(paths.home) } });
+    entries.push({ url: abs(paths.ideas(l)), alternates: { languages: languages(paths.ideas) } });
+    entries.push({ url: abs(paths.styles(l)), alternates: { languages: languages(paths.styles) } });
     for (const r of rooms) {
       entries.push({
         url: abs(paths.room(l, r.slug)),

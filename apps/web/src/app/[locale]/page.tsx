@@ -32,7 +32,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{t.rooms}</h2>
+        <h2 className="text-2xl font-semibold">
+          <Link href={paths.ideas(locale)} className="hover:underline">
+            {t.rooms}
+          </Link>
+        </h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {rooms.map((r) => (
             <li key={r.slug}>
@@ -48,7 +52,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{t.styles}</h2>
+        <h2 className="text-2xl font-semibold">
+          <Link href={paths.styles(locale)} className="hover:underline">
+            {t.styles}
+          </Link>
+        </h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {styles.map((s) => (
             <li key={s.slug}>

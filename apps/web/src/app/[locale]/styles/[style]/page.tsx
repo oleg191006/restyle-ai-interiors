@@ -35,6 +35,7 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
       <Breadcrumbs
         items={[
           { name: t.home, href: paths.home(locale) },
+          { name: t.styles, href: paths.styles(locale) },
           { name: style.name, href: paths.style(locale, slug) },
         ]}
       />
