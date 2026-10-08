@@ -31,8 +31,12 @@ type Sample = {
 // so they are queued and flushed in one beacon instead of one request per metric.
 const queue: Sample[] = [];
 const MAX_BATCH = 20;
-// web-vitals re-reports a metric every time the page is hidden; skip unchanged repeats.
+// One key per document + navigation + metric. web-vitals ids are not enough: it re-reports a
+// metric on every hide, and switching language remounts the root layout, so the hook
+// subscribes again and reports the same interaction under a new id.
+const documentId = Math.random().toString(36).slice(2);
 const lastSent = new Map<string, number>();
+const keyOf = (m: Metric) => `${documentId}:${m.navigationId ?? ""}:${m.name}`;
 const loafs: Loaf[] = [];
 
 if (typeof PerformanceObserver !== "undefined" && PerformanceObserver.supportedEntryTypes?.includes("long-animation-frame")) {
@@ -106,10 +110,11 @@ function inpAttribution(metric: Metric): InpAttribution | undefined {
 
 // Stable function reference: a new one per render would re-report metrics.
 function report(metric: Metric) {
-  if (lastSent.get(metric.id) === metric.value) return;
-  lastSent.set(metric.id, metric.value);
+  const key = keyOf(metric);
+  if (lastSent.get(key) === metric.value) return;
+  lastSent.set(key, metric.value);
   queue.push({
-    id: metric.id,
+    id: key,
     name: metric.name,
     value: metric.value,
     rating: metric.rating,

@@ -48,6 +48,13 @@ itself was input delay 18 + processing 0 + presentation 702 ms, so attribution n
 includes every event of the interaction and the overlapping Long Animation Frames with
 their top scripts, to see what kept the next frame from being painted.
 
+Third report: duplicates with different ids. Switching language changes the root layout
+within the same document, the hook subscribes again and reports the same interaction
+under a new web-vitals id. The client now keys metrics by document + navigation + name.
+The 2992 ms interaction (presentation 2975 ms, no long animation frames) did not
+reproduce in emulation (early tap, long press, slow network to an uncached page,
+language switch: all under 120 ms), so it is device- or browser-specific.
+
 ## Consequences
 
 - No third-party script; client JS did not measurably grow (web-vitals already ships
