@@ -9,5 +9,23 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql
+
+  # S3-compatible stand-in for Cloudflare R2 (ADR 0005): same API, same presigned URLs.
+  # S3Mock accepts any credentials and answers CORS preflights, so browser uploads work.
+  storage:
+    image: adobe/s3mock:5.2.3
+    # The image runs as uid 1000 but a fresh named volume is owned by root, so writes to
+    # /data fail with 500. Local dev only; production uses R2.
+    user: "0:0"
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: restyle
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /data
+    ports:
+      - "9090:9090"
+    volumes:
+      - storagedata:/data
+
 volumes:
   pgdata:
+  storagedata:
