@@ -7,3 +7,4 @@ dist
 *.tsbuildinfo
 next-env.d.ts
 packages/db/src/generated
+.lighthouseci

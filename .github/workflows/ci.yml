@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Throwaway Postgres: the build reads the database (generateStaticParams),
+    # so CI seeds its own copy instead of touching production Neon.
+    services:
+      db:
+        image: postgres:18
+        env:
+          POSTGRES_USER: restyle
+          POSTGRES_PASSWORD: restyle
+          POSTGRES_DB: restyle
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U restyle"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://restyle:restyle@localhost:5432/restyle
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Migrate and seed
+        run: |
+          pnpm --filter @restyle/db exec prisma migrate deploy
+          pnpm db:seed
+
+      - run: pnpm lint
+      - run: pnpm --filter web typecheck
+      - run: pnpm build
+
+      - name: Lighthouse CI
+        run: pnpm lhci
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

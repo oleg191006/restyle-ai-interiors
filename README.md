@@ -21,6 +21,12 @@ pnpm dev                   # http://localhost:3000
 
 Production check: `pnpm build && pnpm --filter web start`.
 
+## CI
+
+Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres is migrated and seeded, then lint, typecheck, build and **Lighthouse CI** (5 pages × 3 runs, mobile). Budgets live in `lighthouserc.json`; a PR fails if the median performance score drops below 90, LCP exceeds 2.5 s, CLS exceeds 0.1, or JS grows past 200 KB.
+
+Locally: `pnpm build && pnpm lhci` (needs Chrome; set `CHROME_PATH` if it is not found).
+
 ## Routes
 
 | URL | Rendering |
@@ -37,7 +43,7 @@ Production check: `pnpm build && pnpm --filter web start`.
 - `generateMetadata` with title, description, canonical, hreflang (`uk-UA`, `en`, `x-default`)
 - JSON-LD: `BreadcrumbList` on every inner page, `FAQPage` on landing pages
 - Real 404 for unknown combinations (no soft 404, see ADR 0001)
-- `next/font` (Inter, latin + cyrillic), no client JS on landing pages
+- System font stack (no web font download, see ADR 0002), no client components on landing pages
 
 ## Notes
 
