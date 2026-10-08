@@ -27,6 +27,15 @@ Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres is migra
 
 Locally: `pnpm build && pnpm lhci` (needs Chrome; set `CHROME_PATH` if it is not found).
 
+## Field metrics (RUM)
+
+Real-user Core Web Vitals are collected by `components/web-vitals.tsx` → `POST /api/vitals` → `WebVital` table (bots and Lighthouse are dropped). See ADR 0003.
+
+```bash
+pnpm vitals:report        # p75 per page type, metric and device, last 28 days
+pnpm vitals:report 7      # last 7 days
+```
+
 ## Routes
 
 | URL | Rendering |
