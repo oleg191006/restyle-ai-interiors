@@ -109,3 +109,33 @@ model WebVital {
 
   @@index([name, route, createdAt])
 }
+
+enum GenerationStatus {
+  queued
+  running
+  done
+  failed
+}
+
+/// One photo redesign job (ADR 0005). Created as `queued`, processed by the QStash worker.
+model Generation {
+  id          String           @id @default(cuid())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  status      GenerationStatus @default(queued)
+  /// Random id from a cookie; no personal data. Used for the per-visitor daily limit.
+  visitorId   String
+  locale      Locale
+  roomSlug    String
+  styleSlug   String
+  inputKey    String
+  outputKey   String?
+  provider    String
+  attempts    Int              @default(0)
+  error       String?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  @@index([visitorId, createdAt])
+  @@index([createdAt])
+}
