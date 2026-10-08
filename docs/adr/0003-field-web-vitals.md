@@ -32,6 +32,15 @@ Own collection:
 3. `pnpm vitals:report [days]` computes p75 per route template, metric and form factor
    with `percentile_cont(0.75)` and rates it against the Core Web Vitals thresholds.
 
+## Follow-up: INP attribution
+
+The first production report showed INP 2072 ms (2 samples, author's phone) while
+throttled emulation (CPU ×6, slow 4G) gave 56–120 ms for every scenario. Lab cannot
+explain it, so INP samples now carry attribution taken from `metric.entries` (Event
+Timing): event type, target element, start time since navigation, and the
+input delay / processing / presentation split. The API rebuilds this object field by
+field with bounded values. `pnpm vitals:report` lists the slowest interactions.
+
 ## Consequences
 
 - No third-party script; client JS did not measurably grow (web-vitals already ships
