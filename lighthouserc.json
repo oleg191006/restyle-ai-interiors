@@ -8,7 +8,8 @@
         "http://localhost:3000/en",
         "http://localhost:3000/uk/ideas/living-room",
         "http://localhost:3000/uk/ideas/living-room/scandinavian",
-        "http://localhost:3000/en/ideas/hallway/eclectic"
+        "http://localhost:3000/en/ideas/hallway/eclectic",
+        "http://localhost:3000/uk/redesign"
       ],
       "numberOfRuns": 3,
       "settings": {

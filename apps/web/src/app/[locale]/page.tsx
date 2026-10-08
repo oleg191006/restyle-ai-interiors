@@ -26,9 +26,9 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <section className="space-y-4">
         <h1 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">{t.tagline}</h1>
         <p className="max-w-xl text-lg text-muted">{t.heroLead}</p>
-        <span className="inline-block rounded-full bg-accent px-5 py-3 font-medium text-background">
+        <Link href={paths.redesign(locale)} className="inline-block rounded-full bg-accent px-5 py-3 font-medium text-background hover:opacity-90">
           {t.cta}
-        </span>
+        </Link>
       </section>
 
       <section className="space-y-4">

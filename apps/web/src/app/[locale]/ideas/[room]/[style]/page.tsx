@@ -55,9 +55,9 @@ export default async function IdeaPage({ params }: Props) {
       <header className="space-y-4">
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight">{page.title}</h1>
         <p className="max-w-2xl text-lg text-muted">{page.lead}</p>
-        <span className="inline-block rounded-full bg-accent px-5 py-3 font-medium text-background">
+        <Link href={paths.redesign(locale, roomSlug, styleSlug)} className="inline-block rounded-full bg-accent px-5 py-3 font-medium text-background hover:opacity-90">
           {t.cta}
-        </span>
+        </Link>
       </header>
 
       <section className="grid gap-8 sm:grid-cols-2">
