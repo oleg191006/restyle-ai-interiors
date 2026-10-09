@@ -11,7 +11,8 @@
     "eval:prompts": "node --experimental-strip-types --no-warnings --env-file=.env.local scripts/eval-prompts.ts",
     "examples:generate": "node --experimental-strip-types --no-warnings --env-file=.env.local scripts/generate-examples.ts",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "stripe:setup": "node --experimental-strip-types --no-warnings --env-file=.env.local scripts/stripe-setup.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1148.0",
@@ -22,7 +23,8 @@
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "stripe": "22.6.2"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

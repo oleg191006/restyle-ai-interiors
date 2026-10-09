@@ -60,7 +60,8 @@ export function RedesignTool({
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ before: string; after: string } | null>(null);
   const [quota, setQuota] = useState<{ used: number; limit: number } | null>(null);
-  const [needsAccount, setNeedsAccount] = useState(false);
+  // The next step offered after a limit error: sign in (guest) or upgrade (Free).
+  const [nextStep, setNextStep] = useState<"signIn" | "upgrade" | null>(null);
   const runId = useRef(0);
 
   // Shows how many generations are left; the tool works without it.
@@ -72,7 +73,9 @@ export function RedesignTool({
   const errorText = (code: string) =>
     code === "limit_plan:anonymous"
       ? t.toolErrorLimitAnonymous
-      : code.startsWith("limit_plan")
+      : code === "limit_plan:free"
+        ? t.toolErrorLimitFree
+        : code.startsWith("limit_plan")
         ? t.toolErrorLimitVisitor
         : code === "limit_global"
         ? t.toolErrorLimitGlobal
@@ -98,7 +101,7 @@ export function RedesignTool({
     if (!photo) return;
     const run = ++runId.current;
     setError(null);
-    setNeedsAccount(false);
+    setNextStep(null);
     setResult(null);
     try {
       setPhase("uploading");
@@ -132,7 +135,7 @@ export function RedesignTool({
       const code = err instanceof Error ? err.message : "";
       setPhase("error");
       setError(errorText(code));
-      setNeedsAccount(code === "limit_plan:anonymous");
+      setNextStep(code === "limit_plan:anonymous" ? "signIn" : code === "limit_plan:free" ? "upgrade" : null);
     }
   }
 
@@ -186,9 +189,14 @@ export function RedesignTool({
           </button>
           <p aria-live="polite" className="text-sm text-muted">
             {busy ? status : error}{" "}
-            {!busy && needsAccount && (
+            {!busy && nextStep === "signIn" && (
               <Link href={`${paths.account(locale)}?next=${encodeURIComponent(paths.redesign(locale, room, style))}`} className="text-accent hover:underline">
                 {t.signIn}
+              </Link>
+            )}
+            {!busy && nextStep === "upgrade" && (
+              <Link href={paths.account(locale)} className="text-accent hover:underline">
+                {t.upgrade}
               </Link>
             )}
           </p>

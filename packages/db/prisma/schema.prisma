@@ -168,9 +168,12 @@ model User {
   image         String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+  /// Stripe customer, created on the first checkout (ADR 0011)
+  stripeCustomerId String?      @unique
   sessions      Session[]
   accounts      Account[]
   generations   Generation[]
+  subscriptions Subscription[]
 
   @@map("user")
 }
@@ -222,4 +225,32 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// Billing (ADR 0011). Stripe is the source of truth; these rows are a local copy kept in sync
+// by webhooks, so a page or API route never waits on Stripe to know the plan.
+
+/// Copy of a Stripe subscription. Always written from a freshly retrieved Subscription object,
+/// never from the event payload, so webhook order does not matter.
+model Subscription {
+  /// Stripe subscription id (sub_…)
+  id                String   @id
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// active | trialing | past_due | canceled | unpaid | incomplete | incomplete_expired | paused
+  status            String
+  priceId           String
+  currentPeriodEnd  DateTime
+  cancelAtPeriodEnd Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// Webhook events already processed. Stripe delivers at least once, so a repeat is skipped.
+model StripeEvent {
+  /// Stripe event id (evt_…)
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
 }

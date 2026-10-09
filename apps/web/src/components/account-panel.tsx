@@ -2,8 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchAccount, usageText, type Account } from "@/lib/account-client";
-import type { Dictionary } from "@/lib/i18n";
+import { fetchAccount, formatDate, formatPrice, goToStripe, usageText, type Account } from "@/lib/account-client";
+import type { Dictionary, Locale } from "@/lib/i18n";
 
 // Better Auth's REST endpoints are called with plain fetch: its client library would add
 // JavaScript this page does not need.
@@ -15,9 +15,13 @@ async function post(path: string, body: unknown) {
 /** Only same-site paths, so ?next= cannot send someone to another site after sign-in. */
 const safeNext = (next: string | null) => (next && next.startsWith("/") && !next.startsWith("//") ? next : null);
 
-export function AccountPanel({ t }: { t: Dictionary }) {
+export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
   const router = useRouter();
-  const next = safeNext(useSearchParams().get("next"));
+  const params = useSearchParams();
+  const next = safeNext(params.get("next"));
+  // Back from Stripe Checkout. The plan changes when the webhook arrives, usually within a
+  // second or two, so the page polls until it sees Pro instead of trusting the redirect.
+  const [activating, setActivating] = useState(params.get("checkout") === "success");
   const [account, setAccount] = useState<Account | null>(null);
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +31,31 @@ export function AccountPanel({ t }: { t: Dictionary }) {
   useEffect(() => {
     fetchAccount().then(setAccount);
   }, []);
+
+  useEffect(() => {
+    if (!activating) return;
+    let tries = 0;
+    const timer = setInterval(async () => {
+      const a = await fetchAccount();
+      setAccount(a);
+      if (a.plan === "pro" || ++tries >= 15) {
+        clearInterval(timer);
+        setActivating(false);
+      }
+    }, 1500);
+    return () => clearInterval(timer);
+  }, [activating]);
+
+  async function billing(path: "checkout" | "portal") {
+    setBusy(true);
+    setError(null);
+    try {
+      await goToStripe(path, locale);
+    } catch {
+      setBusy(false);
+      setError(t.billingError);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +84,13 @@ export function AccountPanel({ t }: { t: Dictionary }) {
   const planName = { anonymous: t.planAnonymous, free: t.planFree, pro: t.planPro }[account.plan];
 
   if (account.email) {
+    const sub = account.subscription;
+    const subText =
+      account.plan === "pro" && sub
+        ? sub.status === "past_due"
+          ? t.proPastDue
+          : (sub.cancelAtPeriodEnd ? t.proEnds : t.proRenews).replace("{date}", formatDate(locale, sub.periodEnd))
+        : null;
     return (
       <div className="max-w-md space-y-4 rounded-xl border border-line p-6">
         <p className="font-medium">{account.email}</p>
@@ -62,7 +98,32 @@ export function AccountPanel({ t }: { t: Dictionary }) {
           {t.plan}: <strong>{planName}</strong>
         </p>
         <p className="text-muted">{usageText(t, account)}</p>
-        <button type="button" onClick={signOut} className="rounded-full border border-line px-5 py-2 hover:border-accent">
+        {subText && <p className="text-sm">{subText}</p>}
+
+        {account.plan === "pro" ? (
+          <button type="button" disabled={busy} onClick={() => billing("portal")} className="w-full rounded-full border border-line px-6 py-3 hover:border-accent disabled:opacity-50">
+            {t.manageBilling}
+          </button>
+        ) : activating ? (
+          <p aria-live="polite" className="text-sm">
+            {t.checkoutPending}
+          </p>
+        ) : (
+          account.pro && (
+            <div className="space-y-3 rounded-lg bg-line/40 p-4">
+              <p className="text-sm">
+                {t.proPitch.replace("{price}", formatPrice(locale, account.pro)).replace("{count}", String(account.pro.generationsPerDay))}
+              </p>
+              <button type="button" disabled={busy} onClick={() => billing("checkout")} className="w-full rounded-full bg-accent px-6 py-3 font-medium text-background disabled:opacity-50">
+                {t.upgrade}
+              </button>
+            </div>
+          )
+        )}
+        <p aria-live="polite" className="text-sm text-muted">
+          {error}
+        </p>
+        <button type="button" onClick={signOut} className="text-sm text-muted hover:text-foreground">
           {t.signOut}
         </button>
       </div>

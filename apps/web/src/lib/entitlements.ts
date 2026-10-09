@@ -16,5 +16,23 @@ export const plans: Record<Plan, Entitlements> = {
 
 export const entitlementsFor = (plan: Plan) => plans[plan];
 
-/** Signed-in users are on Free until a subscription says otherwise (Stripe, next step). */
-export const planFor = (user: { id: string } | null): Plan => (user ? "free" : "anonymous");
+export type SubscriptionState = { status: string; currentPeriodEnd: Date };
+
+// A safety net for a missed cancellation webhook: access never outlives the paid period by more
+// than this, whatever the stored status says.
+const GRACE_MS = 3 * 24 * 60 * 60 * 1000;
+
+/**
+ * Pure, so it is tested without a database or Stripe: a signed-in user whose subscription is in
+ * a Pro status (billing-config.ts) and whose period has not ended is Pro; other users are Free.
+ */
+export function planFor(
+  user: { id: string } | null,
+  subscription: SubscriptionState | null,
+  proStatuses: readonly string[],
+  now = Date.now(),
+): Plan {
+  if (!user) return "anonymous";
+  if (subscription && proStatuses.includes(subscription.status) && subscription.currentPeriodEnd.getTime() + GRACE_MS > now) return "pro";
+  return "free";
+}

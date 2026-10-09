@@ -6,8 +6,8 @@ vi.mock("@restyle/db", () => ({ prisma: { generation: { count } } }));
 
 const { checkLimits, usedToday } = await import("./limits");
 
-const guest: Requester = { visitorId: "v1", user: null, plan: "anonymous" };
-const member: Requester = { visitorId: "v1", user: { id: "u1", email: "a@b.c" }, plan: "free" };
+const guest: Requester = { visitorId: "v1", user: null, plan: "anonymous", subscription: null };
+const member: Requester = { visitorId: "v1", user: { id: "u1", email: "a@b.c" }, plan: "free", subscription: null };
 
 // count() is called twice by checkLimits: first for this person, then for the whole site.
 const counts = (mine: number, all = 0) => count.mockResolvedValueOnce(mine).mockResolvedValueOnce(all);

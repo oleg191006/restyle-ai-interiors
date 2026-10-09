@@ -25,7 +25,7 @@ export default async function AccountPage({ params }: PageProps<"/[locale]/accou
         <p className="max-w-2xl text-lg text-muted">{t.accountLead}</p>
       </header>
       <Suspense>
-        <AccountPanel t={t} />
+        <AccountPanel t={t} locale={locale} />
       </Suspense>
     </div>
   );

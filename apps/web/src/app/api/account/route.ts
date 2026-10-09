@@ -1,4 +1,5 @@
-import { entitlementsFor } from "@/lib/entitlements";
+import { billingEnabled, proPrice } from "@/lib/billing";
+import { entitlementsFor, plans } from "@/lib/entitlements";
 import { usedToday } from "@/lib/limits";
 import { requester } from "@/lib/requester";
 
@@ -8,12 +9,20 @@ import { requester } from "@/lib/requester";
  */
 export async function GET() {
   const who = await requester();
+  const [used, price] = await Promise.all([usedToday(who), billingEnabled() ? proPrice().catch(() => null) : null]);
   return Response.json(
     {
       email: who.user?.email ?? null,
       plan: who.plan,
-      used: await usedToday(who),
+      used,
       limit: entitlementsFor(who.plan).generationsPerDay,
+      subscription: who.subscription && {
+        status: who.subscription.status,
+        periodEnd: who.subscription.currentPeriodEnd,
+        cancelAtPeriodEnd: who.subscription.cancelAtPeriodEnd,
+      },
+      // What upgrading gives, for the offer; null when billing is not configured.
+      pro: price && { ...price, generationsPerDay: plans.pro.generationsPerDay },
     },
     { headers: { "Cache-Control": "private, no-store" } },
   );
