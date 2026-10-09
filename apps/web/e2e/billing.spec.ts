@@ -26,8 +26,10 @@ test("a Free user subscribes, gets Pro, and cancels in the portal", async ({ pag
   test.skip(!account.billing, "Stripe is not configured");
 
   await signUp(page);
-  await expect(page.getByText(/Pro is \$9 a month: 30 generations a day/)).toBeVisible();
-  await page.getByRole("button", { name: "Upgrade to Pro" }).click();
+  // A new account lands in either arm of the paywall experiment (ADR 0012): with or without
+  // the 7-day trial. Both go through the same Checkout and webhook path.
+  await expect(page.getByText(/\$9 a month.*30 generations a day/)).toBeVisible();
+  await page.getByRole("button", { name: /^(Upgrade to Pro|Start 7-day free trial)$/ }).click();
 
   // Stripe-hosted Checkout, test card 4242 4242 4242 4242.
   await page.waitForURL(/checkout\.stripe\.com/);
