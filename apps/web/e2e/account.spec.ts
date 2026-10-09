@@ -36,6 +36,12 @@ test("a guest who runs out of generations signs up and continues", async ({ page
   await generate(page);
   await expect(page.getByRole("img", { name: "After" })).toBeVisible({ timeout: 45_000 });
   await expect(page.getByText("Today: 1 of 5 generations")).toBeVisible();
+
+  // The account keeps the redesign: the same pair is in the history with a download.
+  await page.goto("/en/account");
+  await expect(page.getByRole("heading", { name: "Your redesigns" })).toBeVisible();
+  await expect(page.getByText("Living room · Industrial loft")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Download" })).toBeVisible();
 });
 
 test("the account page is not indexed and rejects a wrong password", async ({ page }) => {
