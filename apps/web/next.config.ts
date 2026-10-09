@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     // Only the generated examples are optimized; nothing else can use the optimizer.
     localPatterns: [{ pathname: "/examples/**", search: "" }],
+    // 60 for the home hero only: both slider layers load before LCP (ADR 0013).
+    qualities: [60, 75],
   },
   // OG images read these at runtime for pages rendered after the build.
   outputFileTracingIncludes: {
