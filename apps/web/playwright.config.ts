@@ -5,7 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
 const baseURL = "http://localhost:3000";
 
 // A fresh documentation-range IP per run, so the per-IP limits (ADR 0008) do not carry over
-// between local runs. `next start` trusts the header; on Vercel the edge overwrites it.
+// between local runs. `next start` trusts the header; on Vercel the edge overwrites it. It is
+// sent with every request, so tests that visit other sites (Stripe) switch it off.
 const clientIp = `198.18.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
 
 export default defineConfig({
