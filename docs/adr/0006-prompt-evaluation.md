@@ -48,7 +48,8 @@ cabinet fronts, countertops and the tablecloth explicitly.
   than the total.
 - Remaining weakness: large storage furniture (wall units, wardrobes) is often kept and
   restyled rather than replaced, the trade-off of forbidding new openings.
-- Cost: ~160 neurons per image, so a full version costs ~1,900 of the shared 10,000 daily
+- Cost: ~110 neurons per image (measured: 20 images = 2,160 on the dashboard), so a full version
+  of 16 costs ~1,750 of the shared 10,000 daily
   neurons. Run evaluations on days without expected traffic.
 
 ## Follow-up: v4 and v5
@@ -76,10 +77,26 @@ errors decide, not a two-point difference.
 v4 fixes invented architecture but introduces "barely changed" results, both in the
 Scandinavian style (kitchen and bathroom, whose tiles stay). Likely cause: v4 says "keep the
 architecture exactly as it is in the photo: the same walls", which contradicts "remove wall
-finishes, tiles, backsplash"; v3 said "wall *positions*". **Production stays on v3.** v5 keeps
-v4's opening rules and pins "the same room shape and wall positions" instead; it will be
-evaluated on all 16 photos (~2,000 neurons) on the next quota day, and becomes production
-only if it keeps the bathroom free of new windows without the v4 kitchen regression.
+finishes, tiles, backsplash"; v3 said "wall *positions*". **Production stays on v3.**
+
+v5 tested that idea on the two deciding rooms (bathroom and kitchen, 8 images):
+
+| Room | v3 | v4 | v5 |
+| --- | --- | --- | --- |
+| bathroom | 4 invented windows | 1 | **3** |
+| kitchen | 18 | 16 | 13; the loft kitchen got a different, larger window |
+
+v5 is rejected, and it was a badly designed experiment: it changed three things at once
+(dropped "exactly as it is in the photo", "walls" → "wall positions", added "tiles"), so the
+result cannot be attributed to any one of them. The likely reading is that "exactly as it is
+in the photo" is what holds the windows back: anchoring to the photo trades invented
+architecture against unchanged rooms. Two further notes:
+
+- The original kitchen is already light wood on white, close to Scandinavian, so "barely
+  changed" there is partly a rubric problem: a faithful Scandinavian kitchen looks like it.
+- v6 changes one variable: v4 with "the same walls" → "the same wall positions" and nothing
+  else (a unit test enforces that). Next quota day: `eval:prompts v6 --rooms=bathroom,kitchen`
+  (~870 neurons), then the other rooms only if it holds.
 
 ## Consequences
 

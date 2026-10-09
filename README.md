@@ -66,7 +66,8 @@ browser resize (≤ 504 px, drops EXIF) → presigned PUT to storage → POST /a
   fixed credentials, so `pnpm qstash:dev` works without copying keys.
 - Prompts are versioned in `lib/ai/prompt.ts`. Compare versions on a fixed photo set before switching
   (ADR 0006): `pnpm --filter web eval:prompts v2 v3` writes contact sheets to `apps/web/scripts/eval/out`
-  (needs the Cloudflare variables in `.env.local`; ~1,900 neurons per version).
+  (needs the Cloudflare variables in `.env.local`; ~110 neurons per image, ~1,750 per version;
+  `--rooms=bathroom,kitchen` runs a subset).
 
 ## Before/after examples
 

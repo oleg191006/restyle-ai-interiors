@@ -12,7 +12,7 @@ image. Constraints:
 - Workers AI FLUX.2 [klein] edits from reference images (`input_image_0..3`), but every
   input must be smaller than 512×512, and the free allowance is 10,000 neurons per day.
   Measured from the published prices: klein 9B ≈ 1,400 neurons per 1024×768 edit (~7 a
-  day), klein 4B ≈ 160 (~60 a day).
+  day), klein 4B ≈ 160 (~60 a day). Measured later on the dashboard: ~110 per image (~90 a day).
 - Vercel functions cap request bodies at 4.5 MB; phone photos are often bigger.
 - Landing pages must stay static and fast (ADR 0001–0003): the tool cannot add weight to them.
 
