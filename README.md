@@ -129,6 +129,7 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 | `/[locale]/account` | static shell, client panel; `noindex` |
 | `/api/auth/*` | Better Auth (sign-up, sign-in, sign-out, session) |
 | `/api/account` | who is signed in, plan, used today, subscription, Pro offer |
+| `/api/account/generations` | the account's finished redesigns from the last 7 days, signed image URLs (ADR 0014) |
 | `/api/billing/checkout`, `/api/billing/portal` | Stripe Checkout and Customer Portal sessions |
 | `/api/stripe/webhook` | Stripe events, signature-verified, idempotent |
 | `/api/events` | page-view beacon → PostHog |
