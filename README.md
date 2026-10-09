@@ -24,7 +24,7 @@ Production check: `pnpm build && pnpm --filter web start`.
 
 ## CI
 
-Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres is migrated and seeded, then lint, typecheck, build and **Lighthouse CI** (6 pages × 3 runs, mobile). Budgets live in `lighthouserc.json`; a PR fails if the median performance score drops below 90, LCP exceeds 2.5 s, CLS exceeds 0.1, or JS grows past 200 KB.
+Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres is migrated and seeded, then lint, typecheck, build and **Lighthouse CI** (6 pages × 5 runs, mobile, median of each metric). Budgets live in `lighthouserc.json`; a PR fails if the median performance score drops below 90, LCP exceeds 2.5 s, CLS exceeds 0.1, or JS grows past 200 KB.
 
 Locally: `pnpm build && pnpm lhci` (needs Chrome; set `CHROME_PATH` if it is not found).
 
@@ -53,6 +53,18 @@ browser resize (≤ 504 px, drops EXIF) → presigned PUT to storage → POST /a
 - Prompts are versioned in `lib/ai/prompt.ts`. Compare versions on a fixed photo set before switching
   (ADR 0006): `pnpm --filter web eval:prompts v2 v3` writes contact sheets to `apps/web/scripts/eval/out`
   (needs the Cloudflare variables in `.env.local`; ~1,900 neurons per version).
+
+## Before/after examples
+
+Each landing page shows a real redesign of its room in its style (ADR 0007), the unique content
+programmatic pages need. Generated in batches by search demand, reviewed by eye, then committed:
+
+```bash
+pnpm --filter web examples:generate --limit 20   # needs the Cloudflare variables in .env.local
+```
+
+Images go to `apps/web/public/examples`, the list to `apps/web/src/data/examples.json`. Mark a bad
+result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 
 ## Routes
 
