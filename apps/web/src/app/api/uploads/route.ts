@@ -1,7 +1,7 @@
 import { checkLimits } from "@/lib/limits";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
+import { requester } from "@/lib/requester";
 import { presignUpload } from "@/lib/storage";
-import { visitorId } from "@/lib/visitor";
 
 const MAX_BYTES = 1_000_000; // the browser sends a ≤ 504 px JPEG, usually 50–150 KB
 
@@ -18,15 +18,15 @@ export async function POST(request: Request) {
   ]);
   if (limited) return tooManyRequests(limited);
 
-  const visitor = await visitorId();
+  const who = await requester();
   const { contentType, size } = ((await request.json().catch(() => ({}))) ?? {}) as { contentType?: unknown; size?: unknown };
   if (contentType !== "image/jpeg") return Response.json({ error: "unsupported_type" }, { status: 400 });
   if (typeof size !== "number" || size <= 0 || size > MAX_BYTES) return Response.json({ error: "too_large" }, { status: 400 });
 
-  const limit = await checkLimits(visitor);
-  if (limit !== "ok") return Response.json({ error: `limit_${limit}` }, { status: 429 });
+  const limit = await checkLimits(who);
+  if (limit !== "ok") return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
 
-  const key = `inputs/${visitor}/${crypto.randomUUID()}.jpg`;
+  const key = `inputs/${who.visitorId}/${crypto.randomUUID()}.jpg`;
   const url = await presignUpload(key, contentType);
   return Response.json({ key, url });
 }

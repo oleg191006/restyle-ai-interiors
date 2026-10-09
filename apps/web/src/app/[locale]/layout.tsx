@@ -43,6 +43,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
               {t.siteName}
             </Link>
             <nav className="flex items-center gap-4 text-sm">
+              {/* A plain link, not a session-aware menu: reading the session here would make
+                  every page dynamic (ADR 0010). */}
+              <Link href={paths.account(locale)} className="text-muted hover:text-foreground">
+                {t.account}
+              </Link>
               <Link href={paths.home(other)} hrefLang={other} className="text-muted hover:text-foreground">
                 {other.toUpperCase()}
               </Link>

@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
-import type { Dictionary, Locale } from "@/lib/i18n";
+import { useEffect, useRef, useState } from "react";
+import { fetchAccount, usageText } from "@/lib/account-client";
+import { paths, type Dictionary, type Locale } from "@/lib/i18n";
 
 type Option = { slug: string; name: string };
 type Phase = "idle" | "uploading" | "queued" | "running" | "done" | "error";
@@ -31,7 +33,8 @@ async function prepare(file: File): Promise<Blob> {
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error ?? `http_${res.status}`);
+  // Limit errors carry the plan, so the message can offer the next step (sign in, upgrade).
+  if (!res.ok) throw new Error([json.error ?? `http_${res.status}`, json.plan].filter(Boolean).join(":"));
   return json as T;
 }
 
@@ -56,12 +59,22 @@ export function RedesignTool({
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ before: string; after: string } | null>(null);
+  const [quota, setQuota] = useState<{ used: number; limit: number } | null>(null);
+  const [needsAccount, setNeedsAccount] = useState(false);
   const runId = useRef(0);
 
+  // Shows how many generations are left; the tool works without it.
+  const loadQuota = () => fetchAccount().then(setQuota, () => {});
+  useEffect(() => {
+    fetchAccount().then(setQuota, () => {});
+  }, []);
+
   const errorText = (code: string) =>
-    code === "limit_visitor"
-      ? t.toolErrorLimitVisitor
-      : code === "limit_global"
+    code === "limit_plan:anonymous"
+      ? t.toolErrorLimitAnonymous
+      : code.startsWith("limit_plan")
+        ? t.toolErrorLimitVisitor
+        : code === "limit_global"
         ? t.toolErrorLimitGlobal
         : code === "rate_limited"
           ? t.toolErrorRateLimited
@@ -85,6 +98,7 @@ export function RedesignTool({
     if (!photo) return;
     const run = ++runId.current;
     setError(null);
+    setNeedsAccount(false);
     setResult(null);
     try {
       setPhase("uploading");
@@ -106,6 +120,7 @@ export function RedesignTool({
         if (g.status === "done" && g.outputUrl) {
           setResult({ before: g.inputUrl, after: g.outputUrl });
           setPhase("done");
+          loadQuota();
           return;
         }
         if (g.status === "failed") throw new Error(g.error ?? "failed");
@@ -114,8 +129,10 @@ export function RedesignTool({
       throw new Error("timeout");
     } catch (err) {
       if (run !== runId.current) return;
+      const code = err instanceof Error ? err.message : "";
       setPhase("error");
-      setError(errorText(err instanceof Error ? err.message : ""));
+      setError(errorText(code));
+      setNeedsAccount(code === "limit_plan:anonymous");
     }
   }
 
@@ -168,9 +185,15 @@ export function RedesignTool({
             {phase === "done" ? t.toolAgain : t.toolSubmit}
           </button>
           <p aria-live="polite" className="text-sm text-muted">
-            {busy ? status : error}
+            {busy ? status : error}{" "}
+            {!busy && needsAccount && (
+              <Link href={`${paths.account(locale)}?next=${encodeURIComponent(paths.redesign(locale, room, style))}`} className="text-accent hover:underline">
+                {t.signIn}
+              </Link>
+            )}
           </p>
         </div>
+        {quota && <p className="text-sm text-muted sm:col-span-2">{usageText(t, quota)}</p>}
         <p className="text-sm text-muted sm:col-span-2">{t.toolPrivacy}</p>
       </form>
 

@@ -52,6 +52,7 @@ jobs:
       QSTASH_NEXT_SIGNING_KEY: sig_5ZB6DVzB1wjE8S6rZ7eenA8Pdnhs
       AI_PROVIDER: fake
       RATE_LIMIT_SALT: ci
+      BETTER_AUTH_SECRET: ci-secret-at-least-32-characters-long
 
     steps:
       - uses: actions/checkout@v4

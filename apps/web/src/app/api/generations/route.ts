@@ -5,14 +5,15 @@ import { getProvider } from "@/lib/ai";
 import { checkLimits } from "@/lib/limits";
 import { enqueueGeneration } from "@/lib/queue";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
-import { visitorId } from "@/lib/visitor";
+import { requester } from "@/lib/requester";
 
 /** Step 2 of ADR 0005: record the job and hand it to the queue. The response is instant. */
 export async function POST(request: Request) {
   const limited = await rateLimit(request, "generate", [{ max: 15, seconds: 86_400 }]);
   if (limited) return tooManyRequests(limited);
 
-  const visitor = await visitorId();
+  const who = await requester();
+  const visitor = who.visitorId;
   const body = ((await request.json().catch(() => ({}))) ?? {}) as Record<string, unknown>;
   const { inputKey, room, style, locale } = body;
 
@@ -29,11 +30,11 @@ export async function POST(request: Request) {
   const [roomRow, styleRow] = await Promise.all([getRoom(locale, room), getStyle(locale, style)]);
   if (!roomRow || !styleRow) return Response.json({ error: "unknown_room_or_style" }, { status: 400 });
 
-  const limit = await checkLimits(visitor);
-  if (limit !== "ok") return Response.json({ error: `limit_${limit}` }, { status: 429 });
+  const limit = await checkLimits(who);
+  if (limit !== "ok") return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
 
   const generation = await prisma.generation.create({
-    data: { visitorId: visitor, locale, roomSlug: room, styleSlug: style, inputKey, provider: getProvider().name },
+    data: { visitorId: visitor, userId: who.user?.id, locale, roomSlug: room, styleSlug: style, inputKey, provider: getProvider().name },
   });
   try {
     await enqueueGeneration(generation.id);
