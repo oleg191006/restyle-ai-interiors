@@ -113,3 +113,6 @@ export async function getAllIdeaPages() {
     updatedAt: p.updatedAt.toISOString(),
   }));
 }
+
+export type RoomSummary = Awaited<ReturnType<typeof getRooms>>[number];
+export type StyleSummary = Awaited<ReturnType<typeof getStyles>>[number];

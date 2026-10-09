@@ -7,7 +7,9 @@ import manifest from "@/data/examples.json";
 
 const available = manifest as Record<string, { promptVersion: string; generatedAt: string; rejected?: string }>;
 
-export function exampleFor(room: string, style: string) {
+export type Example = { before: string; after: string };
+
+export function exampleFor(room: string, style: string): Example | null {
   const entry = available[`${room}--${style}`];
   if (!entry || entry.rejected) return null;
   return { before: `/examples/${room}--before.webp`, after: `/examples/${room}--${style}.webp` };
