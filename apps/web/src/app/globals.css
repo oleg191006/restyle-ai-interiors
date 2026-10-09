@@ -82,34 +82,6 @@ body {
   }
 }
 
-/* Before/after slider: the range input covers the image; only its thumb is visible. */
-.compare-range {
-  appearance: none;
-  background: transparent;
-  cursor: ew-resize;
-}
-.compare-range::-webkit-slider-thumb {
-  appearance: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  background: #fffdf9;
-  border: 2px solid #1e1a16;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
-}
-.compare-range::-moz-range-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  background: #fffdf9;
-  border: 2px solid #1e1a16;
-}
-.compare-range:focus-visible::-webkit-slider-thumb {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
-}
-
-
 /* Sections below the first screen skip layout and paint until they near the viewport: less
    main-thread work on a slow phone (TBT 202 → ~100 ms in lab runs, ADR 0013). `auto` remembers
    each section's real height once rendered, so scrolling back does not jump. */

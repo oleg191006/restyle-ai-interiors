@@ -6,7 +6,8 @@ import { useState, type ReactNode } from "react";
  * Before/after with a draggable divider. Both images are rendered by the server (next/image) and
  * passed in; this component only moves the divider through one CSS variable, so it costs well
  * under a kilobyte of JavaScript and the first paint shows a 50/50 split with no layout shift.
- * The range input is the whole control: keyboard (arrows), touch and screen readers work.
+ * The range input is the whole control: keyboard (arrows), touch and screen readers work. It is
+ * transparent and the handle is a plain element, so no browser's native slider styling shows.
  */
 export function CompareSlider({
   before,
@@ -45,7 +46,11 @@ export function CompareSlider({
         value={pos}
         onChange={(e) => setPos(Number(e.target.value))}
         aria-label={label}
-        className="compare-range absolute inset-0 m-0 h-full w-full"
+        className="peer absolute inset-0 m-0 h-full w-full cursor-ew-resize opacity-0"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute top-1/2 left-(--pos) size-11 -translate-1/2 rounded-full border-2 border-[#1e1a16] bg-[#fffdf9] shadow-[0_4px_14px_rgb(0_0_0/0.25)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
       />
     </div>
   );
