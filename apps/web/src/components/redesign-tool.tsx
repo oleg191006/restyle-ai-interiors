@@ -77,7 +77,7 @@ export function RedesignTool({
         ? t.toolErrorLimitFree
         : code.startsWith("limit_plan")
         ? t.toolErrorLimitVisitor
-        : code === "limit_global"
+        : code.startsWith("limit_global") // the plan is appended to every limit error
         ? t.toolErrorLimitGlobal
         : code === "rate_limited"
           ? t.toolErrorRateLimited

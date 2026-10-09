@@ -51,3 +51,24 @@ test("unknown pages are real 404s and mixed-case URLs redirect to lowercase", as
   expect(res.status()).toBe(308);
   expect(res.headers().location).toMatch(/^(http:\/\/localhost:3000)?\/en\/ideas\/kitchen$/);
 });
+
+// The tool maps API error codes to messages and next steps. The API is stubbed in the browser,
+// so the site-wide cap does not need 50 real generations. Found missing: limit errors carry the
+// plan ("limit_global:anonymous"), and the site-wide message had silently become "failed".
+test.describe("limit messages", () => {
+  for (const [body, message, link] of [
+    [{ error: "limit_global", plan: "anonymous" }, "the site daily limit is reached", null],
+    [{ error: "limit_plan", plan: "anonymous" }, "without an account are used up", "Sign in"],
+    [{ error: "limit_plan", plan: "free" }, "Free generations are used up", "Upgrade to Pro"],
+    [{ error: "rate_limited" }, "Too many attempts from your network", null],
+  ] as const) {
+    test(`${body.error}${"plan" in body ? `:${body.plan}` : ""}`, async ({ page }) => {
+      await page.route("**/api/uploads", (route) => route.fulfill({ status: 429, json: body }));
+      await page.goto("/en/redesign");
+      await page.getByLabel("Room photo").setInputFiles(path.join(test.info().project.testDir, "..", "scripts", "photos", "kitchen.jpg"));
+      await page.getByRole("button", { name: "Generate" }).click();
+      await expect(page.getByText(message)).toBeVisible();
+      if (link) await expect(page.getByRole("link", { name: link })).toBeVisible();
+    });
+  }
+});
