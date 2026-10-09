@@ -155,7 +155,8 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 ## SEO checklist (done)
 
 - `generateMetadata` with title, description, canonical, hreflang (`uk-UA`, `en`, `x-default`)
-- JSON-LD: `BreadcrumbList` on every inner page, `FAQPage` on landing pages
+- JSON-LD: `WebSite` on the home pages (the site name in results), `BreadcrumbList` on every inner page, `FAQPage` on landing pages
+- Own favicon (`app/favicon.ico`, `icon.png`, `apple-icon.png`); `e2e/seo.spec.ts` checks the site name, icons, canonical, hreflang and structured data
 - Real 404 for unknown combinations (no soft 404, see ADR 0001)
 - System font stack for text; Playfair Display for headings on wide screens only, so phones download no font (ADR 0002, 0013); landing pages ship only a sub-kilobyte before/after slider
 

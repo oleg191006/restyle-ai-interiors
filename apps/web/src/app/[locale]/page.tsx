@@ -5,10 +5,11 @@ import { HowItWorks } from "@/components/home/how-it-works";
 import { Pricing } from "@/components/home/pricing";
 import { RoomGallery } from "@/components/home/room-gallery";
 import { StyleShowcase } from "@/components/home/style-showcase";
+import { JsonLd } from "@/components/json-ld";
 import { billingEnabled, proPrice } from "@/lib/billing";
 import { getRooms, getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
-import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
+import { alternatesFor, getDictionary, hasLocale, hreflang, paths, siteUrl } from "@/lib/i18n";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -60,6 +61,18 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       />
       <RoomGallery t={t} locale={locale} rooms={roomItems} styleCount={styles.length} />
       <Pricing t={t} locale={locale} price={price} />
+      {/* The site name Google shows above the result. Without it, a *.vercel.app site is
+          labelled with the host's name ("Vercel"). */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: t.siteName,
+          alternateName: `${t.siteName} AI`,
+          url: new URL(paths.home(locale), siteUrl).toString(),
+          inLanguage: hreflang[locale],
+        }}
+      />
     </>
   );
 }
