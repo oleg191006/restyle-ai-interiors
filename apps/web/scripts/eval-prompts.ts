@@ -5,7 +5,7 @@
 // Runs every prompt version on the same photos × styles with the same seed per pair, so only
 // the prompt differs. Results are cached in scripts/eval/out, so a re-run costs nothing; delete
 // a file to regenerate it. Writes one contact sheet per version for side-by-side review.
-// Cost: ~160 neurons per image (FLUX.2 klein 4B); 3 photos × 4 styles = 12 per version.
+// Cost: ~160 neurons per image (FLUX.2 klein 4B); 4 photos × 4 styles = 16 per version.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -15,7 +15,8 @@ import { evalOutDir, promptFor } from "./lib/pairs.ts";
 import { ensurePhotos, photoPath } from "./lib/photos.ts";
 import { runModel, seedOf, toModelInput } from "./lib/workers-ai.ts";
 
-const ROOMS = ["living-room", "kitchen", "bedroom"];
+// bathroom: a windowless room, added after v3 painted windows into it (ADR 0007)
+const ROOMS = ["living-room", "kitchen", "bedroom", "bathroom"];
 const STYLES = ["scandinavian", "loft", "eclectic", "classic"];
 
 async function evaluate(version: PromptVersion) {
