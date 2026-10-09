@@ -15,6 +15,31 @@ export type Account = {
 export const fetchAccount = (opts: { paywall?: boolean } = {}): Promise<Account> =>
   fetch(opts.paywall ? "/api/account?paywall=1" : "/api/account", { cache: "no-store" }).then((r) => r.json());
 
+/** One finished redesign from GET /api/account/generations; the image URLs live for an hour. */
+export type HistoryItem = { id: string; createdAt: string; room: string; style: string; before: string; after: string };
+
+export const fetchHistory = (): Promise<HistoryItem[]> =>
+  fetch("/api/account/generations", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : { items: [] }))
+    .then((j) => j.items);
+
+/**
+ * Save an image under a readable name. The file is on another origin (R2), where the `download`
+ * attribute is ignored, so it is fetched into a blob first; if that fails, it opens in a tab.
+ */
+export async function downloadImage(url: string, name: string) {
+  try {
+    const blob = await (await fetch(url)).blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch {
+    window.open(url, "_blank", "noopener");
+  }
+}
+
 export const usageText = (t: Dictionary, a: Pick<Account, "used" | "limit">) =>
   t.usage.replace("{used}", String(a.used)).replace("{limit}", String(a.limit));
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { CompareSlider } from "@/components/compare-slider";
-import { fetchAccount, usageText } from "@/lib/account-client";
+import { downloadImage, fetchAccount, usageText } from "@/lib/account-client";
 import { fill, paths, type Dictionary, type Locale } from "@/lib/i18n";
 
 type Option = { slug: string; name: string };
@@ -148,20 +148,7 @@ export function RedesignTool({ locale, rooms, styles, t }: ToolProps) {
     }
   }
 
-  // Storage URLs are on another host, so `download` on a link is ignored; fetch the file instead.
-  async function download() {
-    if (!result) return;
-    try {
-      const blob = await (await fetch(result.after)).blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `restyle-${room}-${style}.jpg`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch {
-      window.open(result.after, "_blank", "noopener");
-    }
-  }
+  const download = () => result && downloadImage(result.after, `restyle-${room}-${style}.jpg`);
 
   const busy = phase === "uploading" || phase === "queued" || phase === "running";
   const status = { uploading: t.toolUploading, queued: t.toolQueued, running: t.toolRunning }[phase as string];
