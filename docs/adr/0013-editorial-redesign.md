@@ -83,7 +83,9 @@ Lessons recorded here because they are not obvious:
 
 ## Consequences
 
-- `CompareSlider` is under a kilobyte of client JS; the two images are server-rendered.
+- `CompareSlider` is under a kilobyte of client JS; the two images are server-rendered. The range
+  input is transparent and the handle is a plain element styled by `peer-focus-visible`: restyling
+  the native thumb through `::-webkit-slider-thumb` left the blue system slider visible in one browser.
 - Mobile and desktop headings use different typefaces by design.
 - The home page has three new client islands per below-fold card (`NearViewport`); fine at
   nine cards, worth revisiting if a page grows to dozens.
