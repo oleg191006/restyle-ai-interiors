@@ -97,6 +97,8 @@ export function promptV4({ room, style, materials, palette }: PromptInput) {
  * architecture exactly as it is in the photo: the same walls", which reads as "keep the walls
  * as they are" and contradicts "remove wall finishes, tiles, backsplash". v3 said "wall
  * positions". v5 keeps v4's opening rules and pins the room shape, not the wall surfaces.
+ * Eval: rejected. Windows came back in 3 of 4 bathrooms, the loft kitchen got a different
+ * window, and the Scandinavian kitchen still kept its cabinets.
  */
 export function promptV5({ room, style, materials, palette }: PromptInput) {
   const r = room.toLowerCase();
@@ -114,7 +116,17 @@ export function promptV5({ room, style, materials, palette }: PromptInput) {
   ].join(" ");
 }
 
-export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4, v5: promptV5 } as const;
+/**
+ * v6: v5 changed three things at once and brought the windows back (bathroom 3 of 4), so its
+ * result says nothing about any single change. v6 is v4 with exactly one edit: "the same
+ * walls" → "the same wall positions". "Exactly as it is in the photo", which likely holds the
+ * windows back, stays.
+ */
+export function promptV6(input: PromptInput) {
+  return promptV4(input).replace("the same walls, ceiling", "the same wall positions, ceiling");
+}
+
+export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4, v5: promptV5, v6: promptV6 } as const;
 export type PromptVersion = keyof typeof prompts;
 
 /** The version used in production. Change only after it wins on the eval set. */

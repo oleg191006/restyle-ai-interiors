@@ -35,6 +35,13 @@ describe("prompts", () => {
     expect(p).toMatch(/tiles and all other wall finishes/);
   });
 
+  // One variable at a time: v6 must differ from v4 in that phrase only.
+  it("v6 is v4 with only the wall wording changed", () => {
+    const [a, b] = [prompts.v4(input).split(" "), prompts.v6(input).split(" ")];
+    expect(b.length).toBe(a.length + 1);
+    expect(prompts.v6(input).replace("the same wall positions", "the same walls")).toBe(prompts.v4(input));
+  });
+
   it("buildPrompt uses the production version", () => {
     expect(buildPrompt(input)).toBe(prompts[currentPromptVersion](input));
   });
