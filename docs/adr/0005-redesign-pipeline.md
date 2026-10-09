@@ -90,6 +90,17 @@ no metadata; the worker rejects unsigned calls (401); another visitor's job is a
 visitor's upload key is a 400; non-JPEG and oversized uploads are a 400; the sixth job of the
 day is refused with 429. The tool page scores Performance 98 with 145 KiB of JS.
 
+First real runs with FLUX.2 [klein] 4B:
+
+- A call takes 7.5–25 s, not "seconds": queueing on the Workers AI side varies.
+- A vague prompt ("replace furniture, decor and finishes") only swapped the sofa. Listing
+  what to keep (walls, windows, doors, ceiling, camera angle) and what to replace
+  (wall finishes, flooring, curtains, lights, furniture, decor, clutter) produced a full
+  redesign. At the default guidance the model invented architecture (a stone column);
+  `guidance: 7` kept the room. Compared on one photo and one seed only, so treat it as a
+  starting point and evaluate on a set of rooms and styles.
+- Output is softer than the original because the input is capped below 512 px.
+
 ## Known gaps
 
 - **Per-visitor limits are cookie based**, so a client that drops cookies gets a fresh

@@ -14,6 +14,9 @@ export const cloudflareProvider: RedesignProvider = {
     form.append("input_image_0", new Blob([new Uint8Array(image)], { type: "image/jpeg" }), "room.jpg");
     form.append("width", "1024");
     form.append("height", "768");
+    // Follow the prompt more strictly: at the default the model invented architecture
+    // (turned a wall unit into a stone column); 7 kept the room and the style.
+    form.append("guidance", "7");
 
     const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env("CLOUDFLARE_ACCOUNT_ID")}/ai/run/${MODEL}`, {
       method: "POST",
