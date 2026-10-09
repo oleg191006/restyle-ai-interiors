@@ -5,6 +5,7 @@ export function routeTemplate(path: string) {
   if (!section) return "/[locale]";
   if (section === "ideas") return b ? "/[locale]/ideas/[room]/[style]" : a ? "/[locale]/ideas/[room]" : "/[locale]/ideas";
   if (section === "styles") return a ? "/[locale]/styles/[style]" : "/[locale]/styles";
+  if (section === "redesign") return "/[locale]/redesign";
   return "/other";
 }
 
