@@ -59,7 +59,13 @@ export function RedesignTool({
   const runId = useRef(0);
 
   const errorText = (code: string) =>
-    code === "limit_visitor" ? t.toolErrorLimitVisitor : code === "limit_global" ? t.toolErrorLimitGlobal : t.toolErrorGeneric;
+    code === "limit_visitor"
+      ? t.toolErrorLimitVisitor
+      : code === "limit_global"
+        ? t.toolErrorLimitGlobal
+        : code === "rate_limited"
+          ? t.toolErrorRateLimited
+          : t.toolErrorGeneric;
 
   async function onFile(file: File | undefined) {
     if (!file) return;

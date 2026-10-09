@@ -1,4 +1,5 @@
 import { checkLimits } from "@/lib/limits";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { presignUpload } from "@/lib/storage";
 import { visitorId } from "@/lib/visitor";
 
@@ -10,6 +11,13 @@ const MAX_BYTES = 1_000_000; // the browser sends a â‰¤ 504 px JPEG, usually 50â
  * lets the generation endpoint check that the photo is theirs.
  */
 export async function POST(request: Request) {
+  // Per IP: a burst limit and a daily cap above the per-visitor one (shared IPs, ADR 0008).
+  const limited = await rateLimit(request, "upload", [
+    { max: 10, seconds: 60 },
+    { max: 30, seconds: 86_400 },
+  ]);
+  if (limited) return tooManyRequests(limited);
+
   const visitor = await visitorId();
   const { contentType, size } = ((await request.json().catch(() => ({}))) ?? {}) as { contentType?: unknown; size?: unknown };
   if (contentType !== "image/jpeg") return Response.json({ error: "unsupported_type" }, { status: 400 });

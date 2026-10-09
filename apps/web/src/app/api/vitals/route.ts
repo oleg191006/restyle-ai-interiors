@@ -1,4 +1,5 @@
 import { prisma, type FormFactor, type VitalName } from "@restyle/db";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { browserOf, routeTemplate } from "@/lib/vitals";
 
 // Field data only: lab runs (Lighthouse, PSI, headless Chrome) and crawlers would skew p75.
@@ -49,6 +50,9 @@ export async function POST(request: Request) {
   const ua = request.headers.get("user-agent") ?? "";
   if (nonHuman.test(ua)) return new Response(null, { status: 204 });
   const browser = browserOf(ua);
+  // A page sends one beacon per view; 60 a minute per IP leaves room for many tabs.
+  const limited = await rateLimit(request, "vitals", [{ max: 60, seconds: 60 }]);
+  if (limited) return tooManyRequests(limited);
 
   let body: unknown;
   try {

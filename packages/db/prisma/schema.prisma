@@ -141,3 +141,14 @@ model Generation {
   @@index([visitorId, createdAt])
   @@index([createdAt])
 }
+
+/// One request counted for IP rate limiting (ADR 0008). `key` is `<action>:<hmac of IP>`; raw
+/// IPs are never stored. Rows older than two days are pruned opportunistically.
+model RateLimitHit {
+  id        BigInt   @id @default(autoincrement())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+}

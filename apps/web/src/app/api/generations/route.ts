@@ -4,10 +4,14 @@ import { hasLocale } from "@/lib/i18n";
 import { getProvider } from "@/lib/ai";
 import { checkLimits } from "@/lib/limits";
 import { enqueueGeneration } from "@/lib/queue";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { visitorId } from "@/lib/visitor";
 
 /** Step 2 of ADR 0005: record the job and hand it to the queue. The response is instant. */
 export async function POST(request: Request) {
+  const limited = await rateLimit(request, "generate", [{ max: 15, seconds: 86_400 }]);
+  if (limited) return tooManyRequests(limited);
+
   const visitor = await visitorId();
   const body = ((await request.json().catch(() => ({}))) ?? {}) as Record<string, unknown>;
   const { inputKey, room, style, locale } = body;
