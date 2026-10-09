@@ -11,7 +11,7 @@
         "http://localhost:3000/en/ideas/hallway/eclectic",
         "http://localhost:3000/uk/redesign"
       ],
-      "numberOfRuns": 3,
+      "numberOfRuns": 5,
       "settings": {
         "onlyCategories": [
           "performance",
@@ -27,7 +27,7 @@
           "error",
           {
             "minScore": 0.9,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "categories:seo": [
@@ -52,21 +52,21 @@
           "error",
           {
             "maxNumericValue": 2500,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "cumulative-layout-shift": [
           "error",
           {
             "maxNumericValue": 0.1,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "total-blocking-time": [
           "warn",
           {
             "maxNumericValue": 200,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "resource-summary:script:size": [
