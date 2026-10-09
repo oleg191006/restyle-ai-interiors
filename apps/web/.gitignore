@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prompt eval results (regenerate with pnpm --filter web eval:prompts)
+/scripts/eval/out
