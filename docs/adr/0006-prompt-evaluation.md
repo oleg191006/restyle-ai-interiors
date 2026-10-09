@@ -51,13 +51,35 @@ cabinet fronts, countertops and the tablecloth explicitly.
 - Cost: ~160 neurons per image, so a full version costs ~1,900 of the shared 10,000 daily
   neurons. Run evaluations on days without expected traffic.
 
-## Follow-up: v4 (pending evaluation)
+## Follow-up: v4 and v5
 
 Publishing examples (ADR 0007) showed v3 adding a window to a windowless bathroom in 3 of 3
 styles; the eval set had no windowless room. The bathroom photo is now part of the eval set
-(4 photos × 4 styles = 16 per version) and v4 removes the two phrases that likely invite a
-window ("the same walls, window and door positions" and "natural daylight"). Production stays
-on v3 until `eval:prompts v3 v4` shows v4 fixing the bathroom without regressing the rest.
+(4 photos × 4 styles = 16 per version). v4 removes the two phrases that likely invite a window
+("the same walls, window and door positions" and "natural daylight") and asks for lighting
+consistent with the photo.
+
+Scored side by side, v3 and v4 in one sitting (`--rooms` runs a subset to save quota):
+
+| Room | v3 | v4 | Note |
+| --- | --- | --- | --- |
+| bathroom (no window) | 16 / 20, **4 invented windows** | 17 / 20, 1 small transom window | the fix works |
+| living room | 18 | 19 | v4 classic finally removes the wall unit |
+| kitchen | 18 | **16** | v4 Scandinavian is almost unchanged: same cabinets, backsplash, tablecloth |
+| bedroom | 18 | 18 | |
+| **Total** | **70 / 80** | **70 / 80** | |
+
+v3's three-room score is 54 here against 52 in the first evaluation: the same images, scored
+again. That is the single-rater noise the limits section warns about, and why architecture
+errors decide, not a two-point difference.
+
+v4 fixes invented architecture but introduces "barely changed" results, both in the
+Scandinavian style (kitchen and bathroom, whose tiles stay). Likely cause: v4 says "keep the
+architecture exactly as it is in the photo: the same walls", which contradicts "remove wall
+finishes, tiles, backsplash"; v3 said "wall *positions*". **Production stays on v3.** v5 keeps
+v4's opening rules and pins "the same room shape and wall positions" instead; it will be
+evaluated on all 16 photos (~2,000 neurons) on the next quota day, and becomes production
+only if it keeps the bathroom free of new windows without the v4 kitchen regression.
 
 ## Consequences
 
