@@ -51,6 +51,14 @@ cabinet fronts, countertops and the tablecloth explicitly.
 - Cost: ~160 neurons per image, so a full version costs ~1,900 of the shared 10,000 daily
   neurons. Run evaluations on days without expected traffic.
 
+## Follow-up: v4 (pending evaluation)
+
+Publishing examples (ADR 0007) showed v3 adding a window to a windowless bathroom in 3 of 3
+styles; the eval set had no windowless room. The bathroom photo is now part of the eval set
+(4 photos × 4 styles = 16 per version) and v4 removes the two phrases that likely invite a
+window ("the same walls, window and door positions" and "natural daylight"). Production stays
+on v3 until `eval:prompts v3 v4` shows v4 fixing the bathroom without regressing the rest.
+
 ## Consequences
 
 - Any prompt change goes through the eval and is recorded here with its scores.

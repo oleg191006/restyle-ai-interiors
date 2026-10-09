@@ -103,6 +103,8 @@ First real runs with FLUX.2 [klein] 4B:
 
 ## Known gaps
 
+> Addressed by ADR 0008 (IP rate limiting on all public write endpoints).
+
 - **Per-visitor limits are cookie based**, so a client that drops cookies gets a fresh
   allowance. They stop honest overuse only. The global daily cap is what protects the AI
   budget. Before a public launch add IP-based rate limiting (for example Upstash Ratelimit)
