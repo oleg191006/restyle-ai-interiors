@@ -2,7 +2,8 @@ import { prisma, type FormFactor, type VitalName } from "@restyle/db";
 import { browserOf, routeTemplate } from "@/lib/vitals";
 
 // Field data only: lab runs (Lighthouse, PSI, headless Chrome) and crawlers would skew p75.
-const nonHuman = /bot|crawl|spider|lighthouse|headlesschrome|chrome-lighthouse|pagespeed/i;
+// "restyle-e2e" marks our own end-to-end test runs.
+const nonHuman = /bot|crawl|spider|lighthouse|headlesschrome|chrome-lighthouse|pagespeed|restyle-e2e/i;
 
 const names = new Set<string>(["LCP", "INP", "CLS", "FCP", "TTFB"]);
 const ratings = new Set(["good", "needs-improvement", "poor"]);
