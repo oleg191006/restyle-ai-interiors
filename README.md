@@ -98,6 +98,14 @@ account page → POST /api/billing/portal → Stripe Customer Portal (card, invo
 4. Test card `4242 4242 4242 4242`, any future date and CVC. `e2e/billing.spec.ts` walks
    Checkout → Pro → portal → cancel; it is skipped when billing is not configured (CI).
 
+## Analytics and the paywall experiment
+
+PostHog from the server only (ADR 0012): no analytics script on landing pages. Funnel events are
+recorded where they happen (`generation_requested`, `limit_reached`, `signed_up`, `paywall_viewed`,
+`checkout_started`, `subscription_started`, …); page views come from one small beacon
+(`/api/events`). The feature flag `paywall-trial` splits eligible Free users 50/50 between paying
+now and a 7-day trial (Stripe `trial_period_days`). Set `POSTHOG_KEY` and `POSTHOG_HOST` to enable.
+
 ## Before/after examples
 
 Each landing page shows a real redesign of its room in its style (ADR 0007), the unique content
@@ -123,6 +131,7 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 | `/api/account` | who is signed in, plan, used today, subscription, Pro offer |
 | `/api/billing/checkout`, `/api/billing/portal` | Stripe Checkout and Customer Portal sessions |
 | `/api/stripe/webhook` | Stripe events, signature-verified, idempotent |
+| `/api/events` | page-view beacon → PostHog |
 | `/[locale]/ideas/[room]/[style]` | top 40 per locale at build, rest on first visit then cached |
 | `/sitemap.xml`, `/robots.txt` | static, hreflang alternates in sitemap |
 | `/` | 307 to `/uk` or `/en` by `Accept-Language` (`src/proxy.ts`) |

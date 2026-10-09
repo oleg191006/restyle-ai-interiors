@@ -84,6 +84,12 @@ person keeps Pro until the period ends, and the account page says so.
   missing signature → 400; duplicate event skipped; processing failure → 500 and not recorded;
   the subscription is re-read instead of trusting the payload; status and period rules. Two
   mutations (recording the event before processing, dropping the period check) are caught.
+- Production (test mode, Stripe dashboard webhook endpoint): a test account signed up,
+  paid with card 4242, the account showed Pro and "Next payment on November 9"; cancelling in
+  the portal turned it into "Pro until November 9, then Free". `/api/account` then returned
+  `status: active, cancelAtPeriodEnd: true`; a second checkout while on Pro → 409; an unsigned
+  webhook → 400. The session cookie is `__Secure-…; HttpOnly; Secure; SameSite=Lax` and a
+  sign-in from another origin → 403 (ADR 0010).
 - Found while testing: Playwright's extra `X-Forwarded-For` header also went to Stripe's own
   API calls from the portal page and failed their CORS preflight, so the portal never loaded.
   The billing test does not send it.
