@@ -27,6 +27,9 @@ kitchen in loft style, and the product can produce exactly that.
 - Landing pages show the pair under the header (server-rendered, no client JS); hubs show
   the "after" image on cards, lazily loaded. Each image has a descriptive `alt`, the section
   says the "after" is AI-generated, and the sitemap lists both images (image sitemap).
+- Hub cards without a published example show the style palette as swatches in a 4:3 box of
+  the same size, and every card fills its grid row, so a hub that is only partly covered still
+  lines up. The placeholders are plain spans: no image request, nothing for LCP or CLS.
 
 ## First batches
 
