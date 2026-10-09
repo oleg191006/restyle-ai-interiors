@@ -91,7 +91,30 @@ export function promptV4({ room, style, materials, palette }: PromptInput) {
   ].join(" ");
 }
 
-export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4 } as const;
+/**
+ * v5: v4 fixed the invented windows (bathroom 4 → 1) but left the Scandinavian kitchen and
+ * bathroom almost untouched: tiles, backsplash and cabinet fronts stayed. v4 says "keep the
+ * architecture exactly as it is in the photo: the same walls", which reads as "keep the walls
+ * as they are" and contradicts "remove wall finishes, tiles, backsplash". v3 said "wall
+ * positions". v5 keeps v4's opening rules and pins the room shape, not the wall surfaces.
+ */
+export function promptV5({ room, style, materials, palette }: PromptInput) {
+  const r = room.toLowerCase();
+  return [
+    `Interior redesign of this ${r}.`,
+    "Keep the architecture: the same room shape and wall positions, ceiling, the doors and windows that are already visible (and no others), radiators, and the exact camera angle and perspective.",
+    "Do not add any windows, doors, openings or wall panels that are not in the photo; if the photo shows no window, the room has no window. Where furniture is removed, the wall behind it stays a plain wall.",
+    `First remove everything currently in the room: wallpaper, tiles and all other wall finishes, curtains, lamps, ${roomItems[r] ?? "furniture, storage, rugs"}, decor and every object on tables and shelves.`,
+    "Nothing from the original finishes or furnishing may remain.",
+    `Then furnish it as a ${style} ${r}:`,
+    `new wall finish typical of ${style} style, new flooring, new furniture, lighting, textiles and a few decor pieces,`,
+    `using ${materials.join(", ")},`,
+    `in a ${palette.join(", ")} colour palette.`,
+    "Tidy, styled like a professional interior magazine photo, photorealistic, sharp details, lighting consistent with the original photo.",
+  ].join(" ");
+}
+
+export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4, v5: promptV5 } as const;
 export type PromptVersion = keyof typeof prompts;
 
 /** The version used in production. Change only after it wins on the eval set. */

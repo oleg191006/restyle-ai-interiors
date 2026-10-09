@@ -1,6 +1,7 @@
 // Prompt evaluation for the redesign model (ADR 0006).
 //
 //   pnpm --filter web eval:prompts v1 v2
+//   pnpm --filter web eval:prompts v3 v4 --rooms=bathroom   (a subset, to spend less quota)
 //
 // Runs every prompt version on the same photos × styles with the same seed per pair, so only
 // the prompt differs. Results are cached in scripts/eval/out, so a re-run costs nothing; delete
@@ -16,7 +17,11 @@ import { ensurePhotos, photoPath } from "./lib/photos.ts";
 import { runModel, seedOf, toModelInput } from "./lib/workers-ai.ts";
 
 // bathroom: a windowless room, added after v3 painted windows into it (ADR 0007)
-const ROOMS = ["living-room", "kitchen", "bedroom", "bathroom"];
+const ALL_ROOMS = ["living-room", "kitchen", "bedroom", "bathroom"];
+const args = process.argv.slice(2);
+const roomsArg = args.find((a) => a.startsWith("--rooms="))?.slice("--rooms=".length).split(",");
+for (const r of roomsArg ?? []) if (!ALL_ROOMS.includes(r)) throw new Error(`Unknown room ${r}; have ${ALL_ROOMS.join(", ")}`);
+const ROOMS = roomsArg ?? ALL_ROOMS;
 const STYLES = ["scandinavian", "loft", "eclectic", "classic"];
 
 async function evaluate(version: PromptVersion) {
@@ -58,12 +63,13 @@ async function contactSheet(version: PromptVersion) {
       layers.push({ input: await sharp(file).resize(W, H, { fit: "cover" }).toBuffer(), left: col * W, top: top + LABEL });
     }
   }
-  const out = path.join(evalOutDir, `${version}-sheet.jpg`);
+  const out = path.join(evalOutDir, `${version}-sheet${roomsArg ? `-${ROOMS.join("+")}` : ""}.jpg`);
   await sharp({ create: { width, height, channels: 3, background: "#1c1a17" } }).composite(layers).jpeg({ quality: 82 }).toFile(out);
   console.log(`sheet: ${out}`);
 }
 
-const versions = (process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(prompts)) as PromptVersion[];
+const named = args.filter((a) => !a.startsWith("--"));
+const versions = (named.length ? named : Object.keys(prompts)) as PromptVersion[];
 for (const v of versions) if (!(v in prompts)) throw new Error(`Unknown prompt version ${v}; have ${Object.keys(prompts).join(", ")}`);
 await ensurePhotos(ROOMS);
 for (const v of versions) {
