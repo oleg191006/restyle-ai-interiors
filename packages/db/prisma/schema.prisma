@@ -131,6 +131,8 @@ model Generation {
   inputKey    String
   outputKey   String?
   provider    String
+  /// Prompt version from apps/web/src/lib/ai/prompt.ts, to compare versions on real jobs
+  promptVersion String?
   attempts    Int              @default(0)
   error       String?
   startedAt   DateTime?

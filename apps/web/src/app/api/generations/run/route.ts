@@ -1,5 +1,5 @@
 import { prisma } from "@restyle/db";
-import { buildPrompt, getProvider } from "@/lib/ai";
+import { buildPrompt, currentPromptVersion, getProvider } from "@/lib/ai";
 import { PermanentError } from "@/lib/ai/types";
 import { getStyle, getRoom } from "@/lib/data";
 import { verifyQStash } from "@/lib/queue";
@@ -38,13 +38,13 @@ export async function POST(request: Request) {
     const result = await provider.redesign({
       image,
       palette: style.palette,
-      prompt: buildPrompt(room.name, style.name, style.materials, style.palette),
+      prompt: buildPrompt({ room: room.name, style: style.name, materials: style.materials, palette: style.palette }),
     });
     const outputKey = `outputs/${g.id}.${result.contentType === "image/png" ? "png" : "jpg"}`;
     await writeObject(outputKey, result.image, result.contentType);
     await prisma.generation.update({
       where: { id: g.id },
-      data: { status: "done", outputKey, provider: provider.name, error: null, finishedAt: new Date() },
+      data: { status: "done", outputKey, provider: provider.name, promptVersion: currentPromptVersion, error: null, finishedAt: new Date() },
     });
     return new Response("ok", { status: 200 });
   } catch (e) {
