@@ -9,3 +9,10 @@ export const PRO_LOOKUP_KEY = "restyle_pro_monthly";
  * are exhausted the status becomes `unpaid` or `canceled` and access ends.
  */
 export const PRO_STATUSES = ["active", "trialing", "past_due"];
+
+/** PostHog feature flag of the paywall experiment (ADR 0012): `control` or `trial`. */
+export const PAYWALL_FLAG = "paywall-trial";
+export type PaywallVariant = "control" | "trial";
+
+/** Free days before the first charge in the `trial` arm. One trial per account. */
+export const TRIAL_DAYS = 7;

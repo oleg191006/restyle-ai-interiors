@@ -1,3 +1,8 @@
+// Field data and analytics only: lab runs (Lighthouse, PSI, headless Chrome) and crawlers would
+// skew them. "restyle-e2e" marks our own end-to-end test runs.
+const nonHuman = /bot|crawl|spider|lighthouse|headlesschrome|chrome-lighthouse|pagespeed|restyle-e2e/i;
+export const isNonHuman = (ua: string) => nonHuman.test(ua);
+
 /** Collapse a concrete path to its route template so RUM samples aggregate per page type. */
 export function routeTemplate(path: string) {
   const [, locale, section, a, b] = path.split("/");

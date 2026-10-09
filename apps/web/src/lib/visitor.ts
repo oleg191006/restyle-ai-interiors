@@ -1,7 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-const COOKIE = "rs_visitor";
+export const VISITOR_COOKIE = "rs_visitor";
+const COOKIE = VISITOR_COOKIE;
 
 /** Random, anonymous visitor id kept in an httpOnly cookie. Only used for daily limits. */
 export async function visitorId() {

@@ -2,7 +2,8 @@ import "server-only";
 import { prisma } from "@restyle/db";
 import { cacheLife } from "next/cache";
 import Stripe from "stripe";
-import { PRO_LOOKUP_KEY } from "./billing-config";
+import { paywallVariant, track } from "./analytics";
+import { PRO_LOOKUP_KEY, TRIAL_DAYS, type PaywallVariant } from "./billing-config";
 import { env } from "./env";
 
 // Stripe is the source of truth for subscriptions; the Subscription table is a local copy kept
@@ -23,6 +24,17 @@ export async function proPrice(): Promise<ProPrice> {
   const price = data[0];
   if (!price) throw new Error(`No active Stripe price with lookup key ${PRO_LOOKUP_KEY}; run pnpm stripe:setup`);
   return { id: price.id, amount: price.unit_amount ?? 0, currency: price.currency, interval: price.recurring?.interval ?? "month" };
+}
+
+/**
+ * What the paywall offers this user (ADR 0012). Only people who never had a subscription enter
+ * the experiment: a returning customer gets no second trial, and asking PostHog for their arm
+ * would count them as exposed to an offer they cannot get.
+ */
+export async function paywallOffer(userId: string): Promise<{ variant: PaywallVariant | null; trialDays: number }> {
+  if ((await prisma.subscription.count({ where: { userId } })) > 0) return { variant: null, trialDays: 0 };
+  const variant = await paywallVariant(userId);
+  return { variant, trialDays: variant === "trial" ? TRIAL_DAYS : 0 };
 }
 
 /**
@@ -63,6 +75,7 @@ export async function syncSubscription(id: string) {
     cancelAtPeriodEnd: sub.cancel_at_period_end || sub.cancel_at !== null,
   };
   await prisma.subscription.upsert({ where: { id: sub.id }, create: { id: sub.id, ...data }, update: data });
+  return { userId, status: sub.status };
 }
 
 /** Events we act on. Everything else is acknowledged and ignored. */
@@ -75,13 +88,26 @@ export async function handleStripeEvent(event: Stripe.Event) {
       }
       return true;
     }
-    case "customer.subscription.created":
-    case "customer.subscription.updated":
+    case "customer.subscription.created": {
+      const { userId, status } = await syncSubscription(event.data.object.id);
+      track(userId, "subscription_started", { status, trial: status === "trialing" });
+      return true;
+    }
+    case "customer.subscription.updated": {
+      const { userId, status } = await syncSubscription(event.data.object.id);
+      // Analytics only: what changed comes from the event, the stored state from Stripe.
+      const before = (event.data.previous_attributes ?? {}) as Partial<Stripe.Subscription>;
+      if (before.status && before.status !== status) track(userId, "subscription_status_changed", { from: before.status, to: status });
+      if (before.cancel_at_period_end === false && event.data.object.cancel_at_period_end) track(userId, "subscription_cancel_requested");
+      return true;
+    }
     case "customer.subscription.deleted":
     case "customer.subscription.paused":
-    case "customer.subscription.resumed":
-      await syncSubscription(event.data.object.id);
+    case "customer.subscription.resumed": {
+      const { userId, status } = await syncSubscription(event.data.object.id);
+      track(userId, "subscription_status_changed", { to: status, event: event.type });
       return true;
+    }
     default:
       return false;
   }

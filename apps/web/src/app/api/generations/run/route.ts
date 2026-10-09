@@ -1,5 +1,6 @@
 import { prisma } from "@restyle/db";
 import { buildPrompt, currentPromptVersion, getProvider } from "@/lib/ai";
+import { track } from "@/lib/analytics";
 import { PermanentError } from "@/lib/ai/types";
 import { getStyle, getRoom } from "@/lib/data";
 import { verifyQStash } from "@/lib/queue";
@@ -46,6 +47,16 @@ export async function POST(request: Request) {
       where: { id: g.id },
       data: { status: "done", outputKey, provider: provider.name, promptVersion: currentPromptVersion, error: null, finishedAt: new Date() },
     });
+    const finishedAt = Date.now();
+    // After the job is saved and outside the job's own logic: track() never throws.
+    track(g.userId ?? g.visitorId, "generation_completed", {
+      provider: provider.name,
+      promptVersion: currentPromptVersion,
+      attempts: attempt,
+      room: g.roomSlug,
+      style: g.styleSlug,
+      seconds: g.createdAt ? Math.round((finishedAt - g.createdAt.getTime()) / 1000) : undefined,
+    });
     return new Response("ok", { status: 200 });
   } catch (e) {
     // Some SDK errors (e.g. connection refused) have an empty message; keep the type then.
@@ -56,6 +67,7 @@ export async function POST(request: Request) {
       data: retry ? { status: "queued", error: message } : { status: "failed", error: message, finishedAt: new Date() },
     });
     console.error(`generation ${g.id} attempt ${attempt} failed`, message);
+    if (!retry) track(g.userId ?? g.visitorId, "generation_failed", { error: message.slice(0, 100), attempts: attempt });
     return new Response(retry ? "retry" : "failed", { status: retry ? 503 : 200 });
   }
 }

@@ -27,16 +27,16 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const load = () => fetchAccount().then(setAccount);
+  const load = () => fetchAccount({ paywall: true }).then(setAccount);
   useEffect(() => {
-    fetchAccount().then(setAccount);
+    fetchAccount({ paywall: true }).then(setAccount);
   }, []);
 
   useEffect(() => {
     if (!activating) return;
     let tries = 0;
     const timer = setInterval(async () => {
-      const a = await fetchAccount();
+      const a = await fetchAccount({ paywall: true });
       setAccount(a);
       if (a.plan === "pro" || ++tries >= 15) {
         clearInterval(timer);
@@ -112,10 +112,13 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
           account.pro && (
             <div className="space-y-3 rounded-lg bg-line/40 p-4">
               <p className="text-sm">
-                {t.proPitch.replace("{price}", formatPrice(locale, account.pro)).replace("{count}", String(account.pro.generationsPerDay))}
+                {(account.pro.trialDays > 0 ? t.proPitchTrial : t.proPitch)
+                  .replace("{price}", formatPrice(locale, account.pro))
+                  .replace("{count}", String(account.pro.generationsPerDay))
+                  .replace("{days}", String(account.pro.trialDays))}
               </p>
               <button type="button" disabled={busy} onClick={() => billing("checkout")} className="w-full rounded-full bg-accent px-6 py-3 font-medium text-background disabled:opacity-50">
-                {t.upgrade}
+                {account.pro.trialDays > 0 ? t.startTrial.replace("{days}", String(account.pro.trialDays)) : t.upgrade}
               </button>
             </div>
           )

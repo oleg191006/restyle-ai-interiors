@@ -23,7 +23,7 @@ async function signUp(page: Page) {
 
 test("a Free user subscribes, gets Pro, and cancels in the portal", async ({ page, request }) => {
   const account = await (await request.get("/api/account")).json();
-  test.skip(!account.pro, "Stripe is not configured");
+  test.skip(!account.billing, "Stripe is not configured");
 
   await signUp(page);
   await expect(page.getByText(/Pro is \$9 a month: 30 generations a day/)).toBeVisible();

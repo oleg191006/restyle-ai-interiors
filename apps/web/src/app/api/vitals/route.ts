@@ -1,10 +1,6 @@
 import { prisma, type FormFactor, type VitalName } from "@restyle/db";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
-import { browserOf, routeTemplate } from "@/lib/vitals";
-
-// Field data only: lab runs (Lighthouse, PSI, headless Chrome) and crawlers would skew p75.
-// "restyle-e2e" marks our own end-to-end test runs.
-const nonHuman = /bot|crawl|spider|lighthouse|headlesschrome|chrome-lighthouse|pagespeed|restyle-e2e/i;
+import { browserOf, isNonHuman, routeTemplate } from "@/lib/vitals";
 
 const names = new Set<string>(["LCP", "INP", "CLS", "FCP", "TTFB"]);
 const ratings = new Set(["good", "needs-improvement", "poor"]);
@@ -48,7 +44,7 @@ function inpAttribution(a: unknown) {
 
 export async function POST(request: Request) {
   const ua = request.headers.get("user-agent") ?? "";
-  if (nonHuman.test(ua)) return new Response(null, { status: 204 });
+  if (isNonHuman(ua)) return new Response(null, { status: 204 });
   const browser = browserOf(ua);
   // A page sends one beacon per view; 60 a minute per IP leaves room for many tabs.
   const limited = await rateLimit(request, "vitals", [{ max: 60, seconds: 60 }]);

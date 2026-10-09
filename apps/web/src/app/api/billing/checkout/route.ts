@@ -1,4 +1,5 @@
-import { billingEnabled, customerFor, proPrice, stripe } from "@/lib/billing";
+import { track } from "@/lib/analytics";
+import { billingEnabled, customerFor, paywallOffer, proPrice, stripe } from "@/lib/billing";
 import { env } from "@/lib/env";
 import { hasLocale } from "@/lib/i18n";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
   const { locale } = ((await request.json().catch(() => ({}))) ?? {}) as { locale?: string };
   const l = locale && hasLocale(locale) ? locale : "uk";
-  const [customer, price] = await Promise.all([customerFor(who.user), proPrice()]);
+  const [customer, price, offer] = await Promise.all([customerFor(who.user), proPrice(), paywallOffer(who.user.id)]);
 
   const session = await stripe().checkout.sessions.create({
     mode: "subscription",
@@ -28,10 +29,15 @@ export async function POST(request: Request) {
     line_items: [{ price: price.id, quantity: 1 }],
     client_reference_id: who.user.id,
     // Lets the webhook find the user even before the customer id is stored.
-    subscription_data: { metadata: { userId: who.user.id } },
+    subscription_data: {
+      metadata: { userId: who.user.id, paywallVariant: offer.variant ?? "none" },
+      // The experiment's trial arm (ADR 0012): the card is collected now, charged after the trial.
+      ...(offer.trialDays > 0 && { trial_period_days: offer.trialDays }),
+    },
     allow_promotion_codes: true,
     success_url: `${env("APP_URL")}/${l}/account?checkout=success`,
     cancel_url: `${env("APP_URL")}/${l}/account`,
   });
+  track(who.user.id, "checkout_started", { variant: offer.variant, trialDays: offer.trialDays });
   return Response.json({ url: session.url });
 }

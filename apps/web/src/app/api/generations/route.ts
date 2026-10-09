@@ -2,6 +2,7 @@ import { prisma } from "@restyle/db";
 import { getRoom, getStyle } from "@/lib/data";
 import { hasLocale } from "@/lib/i18n";
 import { getProvider } from "@/lib/ai";
+import { track } from "@/lib/analytics";
 import { checkLimits } from "@/lib/limits";
 import { enqueueGeneration } from "@/lib/queue";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -30,8 +31,12 @@ export async function POST(request: Request) {
   const [roomRow, styleRow] = await Promise.all([getRoom(locale, room), getStyle(locale, style)]);
   if (!roomRow || !styleRow) return Response.json({ error: "unknown_room_or_style" }, { status: 400 });
 
+  const distinctId = who.user?.id ?? who.visitorId;
   const limit = await checkLimits(who);
-  if (limit !== "ok") return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
+  if (limit !== "ok") {
+    track(distinctId, "limit_reached", { plan: who.plan, scope: limit, at: "generate" });
+    return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
+  }
 
   const generation = await prisma.generation.create({
     data: { visitorId: visitor, userId: who.user?.id, locale, roomSlug: room, styleSlug: style, inputKey, provider: getProvider().name },
@@ -43,5 +48,6 @@ export async function POST(request: Request) {
     console.error("enqueue failed", e);
     return Response.json({ error: "queue_unavailable" }, { status: 503 });
   }
+  track(distinctId, "generation_requested", { plan: who.plan, room, style, locale });
   return Response.json({ id: generation.id }, { status: 202 });
 }

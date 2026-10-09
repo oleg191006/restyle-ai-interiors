@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics";
 import { checkLimits } from "@/lib/limits";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { requester } from "@/lib/requester";
@@ -24,7 +25,10 @@ export async function POST(request: Request) {
   if (typeof size !== "number" || size <= 0 || size > MAX_BYTES) return Response.json({ error: "too_large" }, { status: 400 });
 
   const limit = await checkLimits(who);
-  if (limit !== "ok") return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
+  if (limit !== "ok") {
+    track(who.user?.id ?? who.visitorId, "limit_reached", { plan: who.plan, scope: limit, at: "upload" });
+    return Response.json({ error: `limit_${limit}`, plan: who.plan }, { status: 429 });
+  }
 
   const key = `inputs/${who.visitorId}/${crypto.randomUUID()}.jpg`;
   const url = await presignUpload(key, contentType);

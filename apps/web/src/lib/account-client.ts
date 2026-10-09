@@ -4,14 +4,16 @@ import type { Dictionary } from "./i18n";
 /** Shape of GET /api/account, shared by the account page and the tool (browser side). */
 export type Account = {
   email: string | null;
+  billing: boolean;
   plan: Plan;
   used: number;
   limit: number;
   subscription: { status: string; periodEnd: string; cancelAtPeriodEnd: boolean } | null;
-  pro: { amount: number; currency: string; interval: string; generationsPerDay: number } | null;
+  pro: { amount: number; currency: string; interval: string; generationsPerDay: number; trialDays: number } | null;
 };
 
-export const fetchAccount = (): Promise<Account> => fetch("/api/account", { cache: "no-store" }).then((r) => r.json());
+export const fetchAccount = (opts: { paywall?: boolean } = {}): Promise<Account> =>
+  fetch(opts.paywall ? "/api/account?paywall=1" : "/api/account", { cache: "no-store" }).then((r) => r.json());
 
 export const usageText = (t: Dictionary, a: Pick<Account, "used" | "limit">) =>
   t.usage.replace("{used}", String(a.used)).replace("{limit}", String(a.limit));
