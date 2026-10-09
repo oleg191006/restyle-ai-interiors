@@ -76,7 +76,7 @@ is refused with a "Sign in" link, sign-up, back in the tool at "0 of 5", one mor
   free tier) and a sending domain. Until then a mistyped email is a lost account.
 - Google sign-in: needs an OAuth client in Google Cloud.
 - Guest history is not moved to the account on sign-up.
-- Stripe Checkout, webhooks and the Customer Portal set `pro` (next step, its own ADR).
+- ~~Stripe Checkout, webhooks and the Customer Portal set `pro`~~: done, see ADR 0011.
 
 ## Consequences
 

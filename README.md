@@ -78,9 +78,25 @@ account page and the tool read `GET /api/account` from the browser.
 | --- | --- |
 | Guest (visitor cookie) | 2 |
 | Free (signed in) | 5 |
-| Pro (subscription, next step) | 30 |
+| Pro ($9 / month, Stripe) | 30 |
 
 Set `BETTER_AUTH_SECRET` in `.env.local` (any long random string locally).
+
+### Billing (Stripe test mode, ADR 0011)
+
+```
+account page → POST /api/billing/checkout → Stripe Checkout → Stripe → POST /api/stripe/webhook
+            → Subscription row (copy of Stripe's state) → plan = pro
+account page → POST /api/billing/portal → Stripe Customer Portal (card, invoices, cancel)
+```
+
+1. Put a test key in `.env.local`: `STRIPE_SECRET_KEY=sk_test_…`
+2. `pnpm --filter web stripe:setup` creates the Pro product and price (found by lookup key) and a portal configuration.
+3. Install the [Stripe CLI](https://docs.stripe.com/stripe-cli) and forward webhooks:
+   `stripe listen --api-key $STRIPE_SECRET_KEY --forward-to localhost:3000/api/stripe/webhook`;
+   put the printed `whsec_…` into `STRIPE_WEBHOOK_SECRET`.
+4. Test card `4242 4242 4242 4242`, any future date and CVC. `e2e/billing.spec.ts` walks
+   Checkout → Pro → portal → cancel; it is skipped when billing is not configured (CI).
 
 ## Before/after examples
 
@@ -104,7 +120,9 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 | `/[locale]/redesign` | static shell, client form; room and style preselected from the query |
 | `/[locale]/account` | static shell, client panel; `noindex` |
 | `/api/auth/*` | Better Auth (sign-up, sign-in, sign-out, session) |
-| `/api/account` | who is signed in, plan, used today |
+| `/api/account` | who is signed in, plan, used today, subscription, Pro offer |
+| `/api/billing/checkout`, `/api/billing/portal` | Stripe Checkout and Customer Portal sessions |
+| `/api/stripe/webhook` | Stripe events, signature-verified, idempotent |
 | `/[locale]/ideas/[room]/[style]` | top 40 per locale at build, rest on first visit then cached |
 | `/sitemap.xml`, `/robots.txt` | static, hreflang alternates in sitemap |
 | `/` | 307 to `/uk` or `/en` by `Accept-Language` (`src/proxy.ts`) |
