@@ -5,7 +5,7 @@ const photo = () => path.join(test.info().project.testDir, "..", "scripts", "pho
 
 async function generate(page: Page) {
   await page.getByLabel("Room photo").setInputFiles(photo());
-  await page.getByRole("button", { name: /Generate|Try another style/ }).click();
+  await page.getByRole("button", { name: /^Generate/ }).click();
 }
 
 // The first step of the paywall funnel (ADR 0010): a guest uses up the guest allowance, is

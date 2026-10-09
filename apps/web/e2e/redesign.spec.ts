@@ -18,9 +18,8 @@ test("a photo goes through upload, queue and worker and comes back redesigned", 
   await page.goto("/en/redesign?room=kitchen&style=loft");
 
   // Landing pages link here with room and style preselected.
-  const [room, style] = [page.getByRole("combobox").nth(0), page.getByRole("combobox").nth(1)];
-  await expect(room).toHaveValue("kitchen");
-  await expect(style).toHaveValue("loft");
+  await expect(page.getByRole("radio", { name: "Kitchen" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Industrial loft" })).toBeChecked();
 
   await page.getByLabel("Room photo").setInputFiles({ name: "room.jpg", mimeType: "image/jpeg", buffer: await phonePhoto() });
   await page.getByRole("button", { name: "Generate" }).click();
