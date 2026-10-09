@@ -50,6 +50,9 @@ browser resize (≤ 504 px, drops EXIF) → presigned PUT to storage → POST /a
   FLUX.2 [klein] 4B on Workers AI.
 - Storage is S3Mock locally and Cloudflare R2 in production, through the same S3 API.
 - Copy `apps/web/.env.example` to `apps/web/.env.local`; `pnpm qstash:dev` prints the queue keys.
+- Prompts are versioned in `lib/ai/prompt.ts`. Compare versions on a fixed photo set before switching
+  (ADR 0006): `pnpm --filter web eval:prompts v2 v3` writes contact sheets to `apps/web/scripts/eval/out`
+  (needs the Cloudflare variables in `.env.local`; ~1,900 neurons per version).
 
 ## Routes
 
