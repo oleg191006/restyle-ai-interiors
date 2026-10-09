@@ -44,12 +44,17 @@ Locally, with `X-Forwarded-For` set as Vercel's edge sets it and the cookie drop
 request: uploads 1–10 → 200, 11–12 → 429 with `Retry-After: 60`; another IP right after → 200;
 62 vitals beacons from one IP → 60 accepted, 2 limited; no key in the table contains an IP.
 
+In production, after deploy: one plain upload request and then 11 with a different spoofed
+`X-Forwarded-For` / `X-Real-IP` each. Requests 1–9 with spoofed headers → 200, the 10th → 429:
+all of them were counted against the real client IP, so Vercel overwrites these headers and
+the key cannot be forged from the client.
+
 ## Consequences
 
 - Production needs `RATE_LIMIT_SALT` (a random secret). Changing it resets all counters.
-- Relies on Vercel overwriting `X-Forwarded-For` with the real client IP. Verify after deploy
-  by sending a spoofed header: if a spoofed IP gets a fresh allowance, the key must come from
-  a header the client cannot set.
+- Relies on Vercel overwriting `X-Forwarded-For` with the real client IP (verified above). Behind
+  another proxy or host this must be re-checked: if a spoofed IP gets a fresh allowance, the key
+  must come from a header the client cannot set.
 - Count-then-insert can let a burst overshoot by a few requests. Fine for abuse protection;
   not for billing.
 - At real traffic, every limited request costs two queries and one insert on Neon. Move to

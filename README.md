@@ -24,9 +24,22 @@ Production check: `pnpm build && pnpm --filter web start`.
 
 ## CI
 
-Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres is migrated and seeded, then lint, typecheck, build and **Lighthouse CI** (6 pages × 5 runs, mobile, median of each metric). Budgets live in `lighthouserc.json`; a PR fails if the median performance score drops below 90, LCP exceeds 2.5 s, CLS exceeds 0.1, or JS grows past 200 KB.
+Every push and PR runs `.github/workflows/ci.yml`: a throwaway Postgres and S3Mock start, the database is migrated and seeded, then lint, typecheck, unit tests, build, **end-to-end tests** and **Lighthouse CI** (6 pages × 5 runs, mobile, median of each metric). Budgets live in `lighthouserc.json`; a PR fails if the median performance score drops below 90, LCP exceeds 2.5 s, CLS exceeds 0.1, or JS grows past 200 KB.
 
 Locally: `pnpm build && pnpm lhci` (needs Chrome; set `CHROME_PATH` if it is not found).
+
+## Tests
+
+Two layers, neither spends AI quota (ADR 0009):
+
+```bash
+pnpm --filter web test       # Vitest: pure logic and route handlers with I/O mocked, < 1 s
+pnpm db:up && pnpm build
+pnpm --filter web test:e2e   # Playwright + installed Chrome: real upload → queue → worker → result
+```
+
+The end-to-end run starts `next start` and the QStash dev server itself (or reuses running ones
+locally) and uses the fake AI provider.
 
 ## Field metrics (RUM)
 
@@ -49,7 +62,8 @@ browser resize (≤ 504 px, drops EXIF) → presigned PUT to storage → POST /a
 - `AI_PROVIDER=fake` (default) tints the photo locally and costs nothing; `cloudflare` calls
   FLUX.2 [klein] 4B on Workers AI.
 - Storage is S3Mock locally and Cloudflare R2 in production, through the same S3 API.
-- Copy `apps/web/.env.example` to `apps/web/.env.local`; `pnpm qstash:dev` prints the queue keys.
+- Copy `apps/web/.env.example` to `apps/web/.env.local`; it already holds the QStash dev server's
+  fixed credentials, so `pnpm qstash:dev` works without copying keys.
 - Prompts are versioned in `lib/ai/prompt.ts`. Compare versions on a fixed photo set before switching
   (ADR 0006): `pnpm --filter web eval:prompts v2 v3` writes contact sheets to `apps/web/scripts/eval/out`
   (needs the Cloudflare variables in `.env.local`; ~1,900 neurons per version).
