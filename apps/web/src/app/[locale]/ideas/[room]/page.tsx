@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExampleThumb } from "@/components/example-thumb";
+import { PageHeader } from "@/components/ui/page-header";
 import { getRoom, getRooms, getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
-import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
+import { alternatesFor, fill, getDictionary, hasLocale, paths } from "@/lib/i18n";
 
 export async function generateStaticParams() {
   const rooms = await getRooms("uk");
@@ -43,12 +44,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
           { name: room.name, href: paths.room(locale, slug) },
         ]}
       />
-      <header className="max-w-3xl space-y-3">
-        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-          {t.roomIdeas.replace("{room}", room.name)}
-        </h1>
-        <p className="max-w-2xl text-lg text-muted">{room.intro}</p>
-      </header>
+      <PageHeader title={fill(t.roomIdeas, { room: room.name })} lead={room.intro} />
       <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6">
         {styles.map((s) => {
           const example = exampleFor(slug, s.slug);

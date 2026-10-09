@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExampleThumb } from "@/components/example-thumb";
+import { PageHeader } from "@/components/ui/page-header";
+import { PaletteTiles } from "@/components/ui/swatches";
 import { getRooms, getStyle, getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
@@ -40,20 +42,10 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
           { name: style.name, href: paths.style(locale, slug) },
         ]}
       />
-      <header className="max-w-3xl space-y-3">
-        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">{style.name}</h1>
-        <p className="max-w-2xl text-lg text-muted">{style.summary}</p>
-      </header>
+      <PageHeader title={style.name} lead={style.summary} />
       <section className="max-w-xl space-y-4">
         <h2 className="font-display text-2xl font-semibold sm:text-3xl">{t.palette}</h2>
-        <ul aria-label={t.palette} className="grid grid-cols-4 gap-3">
-          {style.palette.map((c) => (
-            <li key={c} className="space-y-2">
-              <span className="block aspect-square rounded-xl ring-1 ring-black/10" style={{ backgroundColor: c }} />
-              <code className="text-xs text-muted">{c}</code>
-            </li>
-          ))}
-        </ul>
+        <PaletteTiles colors={style.palette} label={t.palette} />
       </section>
       <section className="space-y-5">
         <h2 className="font-display text-2xl font-semibold sm:text-3xl">{t.styleIn}</h2>

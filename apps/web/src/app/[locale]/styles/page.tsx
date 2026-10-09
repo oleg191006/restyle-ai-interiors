@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExampleThumb } from "@/components/example-thumb";
+import { PageHeader } from "@/components/ui/page-header";
 import { getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
@@ -32,10 +33,7 @@ export default async function StylesIndex({ params }: PageProps<"/[locale]/style
           { name: t.styles, href: paths.styles(locale) },
         ]}
       />
-      <header className="max-w-3xl space-y-3">
-        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">{t.stylesTitle}</h1>
-        <p className="max-w-2xl text-lg text-muted">{t.stylesLead}</p>
-      </header>
+      <PageHeader title={t.stylesTitle} lead={t.stylesLead} />
       <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {styles.map((s) => (
           <li key={s.slug}>

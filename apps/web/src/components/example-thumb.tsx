@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Swatches } from "@/components/ui/swatches";
 
 /**
  * 4:3 media on hub cards: the "after" image when the pair has a published example, otherwise
@@ -18,11 +19,7 @@ export function ExampleThumb({ src, palette, alt, sizes }: { src?: string; palet
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
         />
       ) : (
-        <span aria-hidden className="flex h-full items-center justify-center gap-2">
-          {palette?.map((c) => (
-            <span key={c} className="size-7 rounded-full ring-1 ring-black/10" style={{ backgroundColor: c }} />
-          ))}
-        </span>
+        palette && <Swatches colors={palette} size="lg" className="h-full justify-center" />
       )}
     </span>
   );
