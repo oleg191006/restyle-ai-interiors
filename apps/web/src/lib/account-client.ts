@@ -12,6 +12,18 @@ export type Account = {
   pro: { amount: number; currency: string; interval: string; generationsPerDay: number; trialDays: number } | null;
 };
 
+/**
+ * Better Auth's REST endpoints (sign-in/email, sign-up/email, sign-out) with plain fetch: its
+ * client library would add JavaScript the account page does not need. True when it succeeded.
+ */
+export async function authRequest(path: string, body: unknown = {}) {
+  const res = await fetch(`/api/auth/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  return res.ok;
+}
+
+/** Only same-site paths, so ?next= cannot send someone to another site after sign-in. */
+export const safeNext = (next: string | null) => (next && next.startsWith("/") && !next.startsWith("//") ? next : null);
+
 export const fetchAccount = (opts: { paywall?: boolean } = {}): Promise<Account> =>
   fetch(opts.paywall ? "/api/account?paywall=1" : "/api/account", { cache: "no-store" }).then((r) => r.json());
 

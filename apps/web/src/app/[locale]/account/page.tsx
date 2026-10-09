@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { AccountPanel, AccountSkeleton } from "@/components/account-panel";
+import { AccountPanel } from "@/components/account/account-panel";
+import { AccountSkeleton } from "@/components/account/account-skeleton";
+import { PageHeader } from "@/components/ui/page-header";
 import { getRooms, getStyles } from "@/lib/data";
 import { plans } from "@/lib/entitlements";
 import { getDictionary, hasLocale } from "@/lib/i18n";
@@ -29,7 +31,7 @@ export default async function AccountPage({ params }: PageProps<"/[locale]/accou
 
   return (
     <div className="container-page space-y-8 py-10 sm:py-14">
-      <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">{t.accountTitle}</h1>
+      <PageHeader title={t.accountTitle} />
       <Suspense fallback={<AccountSkeleton />}>
         <AccountPanel t={t} locale={locale} names={names} limits={limits} />
       </Suspense>
