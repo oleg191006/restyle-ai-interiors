@@ -14,10 +14,13 @@ export function Palette({ colors, label }: { colors: string[]; label: string }) 
   );
 }
 
-/** Small swatch strip used on cards. Fixed height so it never shifts layout. */
+/**
+ * Small swatch strip used on cards. Fixed height so it never shifts layout; the ring keeps a
+ * colour close to the page background (dark palettes in dark mode) from looking cut off.
+ */
 export function PaletteStrip({ colors }: { colors: string[] }) {
   return (
-    <span className="flex h-2 overflow-hidden rounded-full" aria-hidden>
+    <span className="flex h-2 overflow-hidden rounded-full ring-1 ring-line" aria-hidden>
       {colors.map((c) => (
         <span key={c} className="flex-1" style={{ backgroundColor: c }} />
       ))}

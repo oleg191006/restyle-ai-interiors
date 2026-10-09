@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ideas/[r
   if (!room) return {};
   const t = getDictionary(locale);
   return {
-    title: `${t.ideasFor}: ${room.name}`,
+    title: t.roomIdeas.replace("{room}", room.name),
     description: room.intro,
     alternates: alternatesFor(locale, (l) => paths.room(l, slug)),
   };
@@ -46,7 +46,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
       />
       <header className="space-y-3">
         <h1 className="text-4xl font-semibold tracking-tight">
-          {t.ideasFor}: {room.name}
+          {t.roomIdeas.replace("{room}", room.name)}
         </h1>
         <p className="max-w-2xl text-lg text-muted">{room.intro}</p>
       </header>
@@ -57,16 +57,15 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
             <li key={s.slug}>
               <Link
                 href={paths.idea(locale, slug, s.slug)}
-                className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+                className="block h-full space-y-3 rounded-xl border border-line p-4 hover:border-accent"
               >
-                {example && (
-                  <ExampleThumb
-                    src={example.after}
-                    alt={`${room.name}: ${s.name}`}
-                    sizes="(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw"
-                  />
-                )}
-                <PaletteStrip colors={s.palette} />
+                <ExampleThumb
+                  src={example?.after}
+                  palette={s.palette}
+                  alt={`${room.name}: ${s.name}`}
+                  sizes="(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw"
+                />
+                {example && <PaletteStrip colors={s.palette} />}
                 <span className="block font-medium">{s.name}</span>
                 <span className="block text-sm text-muted">{s.summary}</span>
               </Link>

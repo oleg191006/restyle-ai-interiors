@@ -58,15 +58,14 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
               <li key={r.slug}>
                 <Link
                   href={paths.idea(locale, r.slug, slug)}
-                  className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+                  className="block h-full space-y-3 rounded-xl border border-line p-4 hover:border-accent"
                 >
-                  {example && (
-                    <ExampleThumb
-                      src={example.after}
-                      alt={`${r.name}: ${style.name}`}
-                      sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 50vw"
-                    />
-                  )}
+                  <ExampleThumb
+                    src={example?.after}
+                    palette={style.palette}
+                    alt={`${r.name}: ${style.name}`}
+                    sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 50vw"
+                  />
                   <span className="block">{r.name}</span>
                 </Link>
               </li>

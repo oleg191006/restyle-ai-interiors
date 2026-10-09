@@ -40,7 +40,7 @@ export default async function StylesIndex({ params }: PageProps<"/[locale]/style
           <li key={s.slug}>
             <Link
               href={paths.style(locale, s.slug)}
-              className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+              className="block h-full space-y-3 rounded-xl border border-line p-4 hover:border-accent"
             >
               <PaletteStrip colors={s.palette} />
               <span className="block font-medium">{s.name}</span>

@@ -16,5 +16,5 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const locale = hasLocale(raw) ? raw : "uk";
   const t = getDictionary(locale);
   const room = await getRoom(locale, slug);
-  return renderOgImage({ eyebrow: t.rooms, title: room ? `${t.ideasFor}: ${room.name}` : t.tagline });
+  return renderOgImage({ eyebrow: t.rooms, title: room ? t.roomIdeas.replace("{room}", room.name) : t.tagline });
 }
