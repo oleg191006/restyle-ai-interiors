@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { ExampleThumb } from "@/components/example-thumb";
 import { Palette } from "@/components/palette";
 import { getRooms, getStyle, getStyles } from "@/lib/data";
+import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
 
 export async function generateStaticParams() {
@@ -50,16 +52,26 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">{t.styleIn}</h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {rooms.map((r) => (
-            <li key={r.slug}>
-              <Link
-                href={paths.idea(locale, r.slug, slug)}
-                className="block rounded-xl border border-line p-4 hover:border-accent"
-              >
-                {r.name}
-              </Link>
-            </li>
-          ))}
+          {rooms.map((r) => {
+            const example = exampleFor(r.slug, slug);
+            return (
+              <li key={r.slug}>
+                <Link
+                  href={paths.idea(locale, r.slug, slug)}
+                  className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+                >
+                  {example && (
+                    <ExampleThumb
+                      src={example.after}
+                      alt={`${r.name}: ${style.name}`}
+                      sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 50vw"
+                    />
+                  )}
+                  <span className="block">{r.name}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </section>
     </div>

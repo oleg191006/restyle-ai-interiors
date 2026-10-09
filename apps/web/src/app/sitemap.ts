@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllIdeaPages, getRooms, getStyles } from "@/lib/data";
+import { exampleFor } from "@/lib/examples";
 import { defaultLocale, hreflang, locales, paths, siteUrl, type Locale } from "@/lib/i18n";
 
 const abs = (path: string) => new URL(path, siteUrl).toString();
@@ -39,10 +40,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
   for (const p of pages) {
+    const example = exampleFor(p.room, p.style);
     entries.push({
       url: abs(paths.idea(p.locale, p.room, p.style)),
       lastModified: p.updatedAt,
       alternates: { languages: languages((x) => paths.idea(x, p.room, p.style)) },
+      // Image sitemap: lets Google Images find the before/after examples (ADR 0007).
+      ...(example && { images: [abs(example.before), abs(example.after)] }),
     });
   }
   return entries;

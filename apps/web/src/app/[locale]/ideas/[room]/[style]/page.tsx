@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BeforeAfter } from "@/components/before-after";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JsonLd } from "@/components/json-ld";
 import { Palette } from "@/components/palette";
 import { getIdeaPage, getRoom, getRooms, getStyle, getStyles, getTopIdeaParams } from "@/lib/data";
+import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
 
 type Props = PageProps<"/[locale]/ideas/[room]/[style]">;
@@ -40,6 +42,9 @@ export default async function IdeaPage({ params }: Props) {
   ]);
   if (!page || !room || !style) notFound();
   const t = getDictionary(locale);
+  const example = exampleFor(roomSlug, styleSlug);
+  const afterAlt =
+    locale === "uk" ? `${room.name} у стилі «${style.name}» — AI-редизайн` : `${style.name} ${room.name.toLowerCase()} — AI redesign`;
 
   return (
     <article className="space-y-10">
@@ -59,6 +64,23 @@ export default async function IdeaPage({ params }: Props) {
           {t.cta}
         </Link>
       </header>
+
+      {example && (
+        <section className="space-y-3" aria-labelledby="example">
+          <h2 id="example" className="text-xl font-semibold">
+            {t.exampleTitle}
+          </h2>
+          <BeforeAfter
+            before={example.before}
+            after={example.after}
+            beforeAlt={`${room.name} ${t.exampleBeforeAlt}`}
+            afterAlt={afterAlt}
+            beforeLabel={t.toolBefore}
+            afterLabel={t.toolAfter}
+          />
+          <p className="text-sm text-muted">{t.exampleNote}</p>
+        </section>
+      )}
 
       <section className="grid gap-8 sm:grid-cols-2">
         <div className="space-y-3">

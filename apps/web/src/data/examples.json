@@ -1,0 +1,101 @@
+{
+  "bathroom--japandi": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09",
+    "rejected": "added a window to a windowless bathroom (invented architecture)"
+  },
+  "bathroom--minimalist": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09",
+    "rejected": "added a window to a windowless bathroom (invented architecture)"
+  },
+  "bathroom--scandinavian": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09",
+    "rejected": "added a window to a windowless bathroom (invented architecture)"
+  },
+  "bedroom--classic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--eclectic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--japandi": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--loft": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--minimalist": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--modern": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "bedroom--scandinavian": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--classic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--eclectic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--japandi": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--loft": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--minimalist": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--modern": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "kitchen--scandinavian": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--classic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--eclectic": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--japandi": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--loft": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--minimalist": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--modern": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  },
+  "living-room--scandinavian": {
+    "promptVersion": "v3",
+    "generatedAt": "2026-10-09"
+  }
+}

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { ExampleThumb } from "@/components/example-thumb";
 import { PaletteStrip } from "@/components/palette";
 import { getRoom, getRooms, getStyles } from "@/lib/data";
+import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
 
 export async function generateStaticParams() {
@@ -49,18 +51,28 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
         <p className="max-w-2xl text-lg text-muted">{room.intro}</p>
       </header>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {styles.map((s) => (
-          <li key={s.slug}>
-            <Link
-              href={paths.idea(locale, slug, s.slug)}
-              className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
-            >
-              <PaletteStrip colors={s.palette} />
-              <span className="block font-medium">{s.name}</span>
-              <span className="block text-sm text-muted">{s.summary}</span>
-            </Link>
-          </li>
-        ))}
+        {styles.map((s) => {
+          const example = exampleFor(slug, s.slug);
+          return (
+            <li key={s.slug}>
+              <Link
+                href={paths.idea(locale, slug, s.slug)}
+                className="block space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+              >
+                {example && (
+                  <ExampleThumb
+                    src={example.after}
+                    alt={`${room.name}: ${s.name}`}
+                    sizes="(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw"
+                  />
+                )}
+                <PaletteStrip colors={s.palette} />
+                <span className="block font-medium">{s.name}</span>
+                <span className="block text-sm text-muted">{s.summary}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
