@@ -118,6 +118,21 @@ pnpm --filter web examples:generate --limit 20   # needs the Cloudflare variable
 Images go to `apps/web/public/examples`, the list to `apps/web/src/data/examples.json`. Mark a bad
 result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 
+## Code layout
+
+`apps/web/src`:
+
+- `app/` routes. A page reads data, shapes it and lists its sections; it holds little markup.
+- `components/<feature>/` sections and client widgets: `home/`, `idea/` (landing pages),
+  `redesign/` (the tool), `account/`, `layout/` (header, footer). Client logic sits in hooks
+  (`use-generation.ts`, `use-account.ts`) and pure functions with unit tests (`errors.ts`);
+  the components only render.
+- `components/ui/` small shared pieces: `button()` class names for buttons and links,
+  palette swatches and tiles, chip links, the first-screen image, the page header.
+- `lib/` server and shared logic: data access, auth, billing, limits, analytics, storage;
+  `lib/i18n/` has one dictionary file per locale, and `en.ts` is typed by `uk.ts`, so a missing
+  translation fails the type check.
+
 ## Routes
 
 | URL | Rendering |
