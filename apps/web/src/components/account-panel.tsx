@@ -92,7 +92,7 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
           : (sub.cancelAtPeriodEnd ? t.proEnds : t.proRenews).replace("{date}", formatDate(locale, sub.periodEnd))
         : null;
     return (
-      <div className="max-w-md space-y-4 rounded-xl border border-line p-6">
+      <div className="max-w-md space-y-4 rounded-2xl border border-line bg-surface p-6 sm:p-8">
         <p className="font-medium">{account.email}</p>
         <p>
           {t.plan}: <strong>{planName}</strong>
@@ -117,7 +117,7 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
                   .replace("{count}", String(account.pro.generationsPerDay))
                   .replace("{days}", String(account.pro.trialDays))}
               </p>
-              <button type="button" disabled={busy} onClick={() => billing("checkout")} className="w-full rounded-full bg-accent px-6 py-3 font-medium text-background disabled:opacity-50">
+              <button type="button" disabled={busy} onClick={() => billing("checkout")} className="w-full min-h-12 rounded-full bg-accent px-6 py-3 font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-50">
                 {account.pro.trialDays > 0 ? t.startTrial.replace("{days}", String(account.pro.trialDays)) : t.upgrade}
               </button>
             </div>
@@ -138,10 +138,10 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
       <p className="text-muted">
         {t.plan}: {planName} · {usageText(t, account)}
       </p>
-      <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-line p-6">
+      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-line bg-surface p-6 sm:p-8">
         <label className="flex flex-col gap-2">
           <span className="font-medium">{t.email}</span>
-          <input name="email" type="email" required autoComplete="email" className="rounded-xl border border-line bg-background p-3" />
+          <input name="email" type="email" required autoComplete="email" className="min-h-12 rounded-xl border border-line-strong bg-background px-4 py-3 focus:border-accent focus:outline-none" />
         </label>
         <label className="flex flex-col gap-2">
           <span className="font-medium">{t.password}</span>
@@ -151,11 +151,11 @@ export function AccountPanel({ t, locale }: { t: Dictionary; locale: Locale }) {
             required
             minLength={8}
             autoComplete={mode === "signIn" ? "current-password" : "new-password"}
-            className="rounded-xl border border-line bg-background p-3"
+            className="min-h-12 rounded-xl border border-line-strong bg-background px-4 py-3 focus:border-accent focus:outline-none"
           />
           {mode === "signUp" && <span className="text-sm text-muted">{t.passwordHint}</span>}
         </label>
-        <button type="submit" disabled={busy} className="w-full rounded-full bg-accent px-6 py-3 font-medium text-background disabled:opacity-50">
+        <button type="submit" disabled={busy} className="w-full min-h-12 rounded-full bg-accent px-6 py-3 font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-50">
           {mode === "signIn" ? t.signIn : t.signUp}
         </button>
         <p aria-live="polite" className="text-sm text-muted">

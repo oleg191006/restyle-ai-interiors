@@ -19,7 +19,9 @@ export const usageText = (t: Dictionary, a: Pick<Account, "used" | "limit">) =>
   t.usage.replace("{used}", String(a.used)).replace("{limit}", String(a.limit));
 
 export const formatPrice = (locale: string, p: { amount: number; currency: string }) =>
-  new Intl.NumberFormat(locale, { style: "currency", currency: p.currency, maximumFractionDigits: 0 }).format(p.amount / 100);
+  new Intl.NumberFormat(locale, { style: "currency", currency: p.currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(
+    p.amount / 100,
+  );
 
 export const formatDate = (locale: string, iso: string) => new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long" });
 

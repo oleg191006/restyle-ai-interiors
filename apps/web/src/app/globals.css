@@ -1,32 +1,119 @@
 @import "tailwindcss";
 
+/* Editorial palette (docs/adr/0013): warm paper, ink, one terracotta accent. Text colours keep
+   4.5:1 on their background; white on accent is 6:1. */
 :root {
-  --background: #fbfaf8;
-  --foreground: #1c1a17;
-  --muted: #6b655c;
-  --line: #e6e1d9;
-  --accent: #7a5c3e;
+  --background: #f6f1ea;
+  --surface: #fffdf9;
+  --foreground: #1e1a16;
+  --muted: #6b6157;
+  --line: #e4dacd;
+  --line-strong: #d8ccbd;
+  --accent: #9e4a2a;
+  --accent-hover: #86391e;
+  --accent-soft: #f0e6da;
+  --on-accent: #ffffff;
+  --inverse: #1e1a16;
+  --inverse-foreground: #f6f1ea;
+  --inverse-muted: #c9beb1;
+  --inverse-line: #3a332c;
+  /* Phones: the system serif (New York on iOS, Noto Serif on Android), zero bytes. */
+  --heading-font: ui-serif, Georgia, "Noto Serif", "Times New Roman", serif;
+}
+
+@media (width >= 64rem) {
+  :root {
+    --heading-font: var(--font-playfair), ui-serif, Georgia, serif;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #141311;
-    --foreground: #ece8e1;
-    --muted: #a39d93;
-    --line: #2c2a26;
-    --accent: #d2a777;
+    --background: #171411;
+    --surface: #211c18;
+    --foreground: #efe8de;
+    --muted: #b3a89a;
+    --line: #352f29;
+    --line-strong: #4a4239;
+    --accent: #d9875f;
+    --accent-hover: #e79a74;
+    --accent-soft: #2e2520;
+    /* The dark-mode accent is light, so text on it is dark (white would be 2.6:1). */
+    --on-accent: #1e1a16;
+    --inverse: #2a231e;
+    --inverse-foreground: #efe8de;
+    --inverse-muted: #b3a89a;
+    --inverse-line: #463c34;
   }
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --color-inverse-muted: var(--inverse-muted);
+  --color-inverse-line: var(--inverse-line);
+  /* Headings only; which typeface depends on the screen width (--heading-font, ADR 0013). */
+  --font-display: var(--heading-font);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* The page width every section shares. */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 75rem;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Before/after slider: the range input covers the image; only its thumb is visible. */
+.compare-range {
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+}
+.compare-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #fffdf9;
+  border: 2px solid #1e1a16;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+}
+.compare-range::-moz-range-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #fffdf9;
+  border: 2px solid #1e1a16;
+}
+.compare-range:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+
+/* Sections below the first screen skip layout and paint until they near the viewport: less
+   main-thread work on a slow phone (TBT 202 → ~100 ms in lab runs, ADR 0013). `auto` remembers
+   each section's real height once rendered, so scrolling back does not jump. */
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }

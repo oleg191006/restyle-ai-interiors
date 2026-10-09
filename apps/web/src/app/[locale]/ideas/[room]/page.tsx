@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExampleThumb } from "@/components/example-thumb";
-import { PaletteStrip } from "@/components/palette";
 import { getRoom, getRooms, getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
@@ -36,7 +35,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
   const t = getDictionary(locale);
 
   return (
-    <div className="space-y-8">
+    <div className="container-page space-y-8 py-10 sm:py-14">
       <Breadcrumbs
         items={[
           { name: t.home, href: paths.home(locale) },
@@ -44,20 +43,20 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
           { name: room.name, href: paths.room(locale, slug) },
         ]}
       />
-      <header className="space-y-3">
-        <h1 className="text-4xl font-semibold tracking-tight">
+      <header className="max-w-3xl space-y-3">
+        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
           {t.roomIdeas.replace("{room}", room.name)}
         </h1>
         <p className="max-w-2xl text-lg text-muted">{room.intro}</p>
       </header>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6">
         {styles.map((s) => {
           const example = exampleFor(slug, s.slug);
           return (
             <li key={s.slug}>
               <Link
                 href={paths.idea(locale, slug, s.slug)}
-                className="block h-full space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+                className="group block h-full space-y-3"
               >
                 <ExampleThumb
                   src={example?.after}
@@ -65,8 +64,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
                   alt={`${room.name}: ${s.name}`}
                   sizes="(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw"
                 />
-                {example && <PaletteStrip colors={s.palette} />}
-                <span className="block font-medium">{s.name}</span>
+                <span className="font-display block text-xl font-semibold group-hover:text-accent">{s.name}</span>
                 <span className="block text-sm text-muted">{s.summary}</span>
               </Link>
             </li>

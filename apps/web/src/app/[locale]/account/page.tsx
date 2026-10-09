@@ -19,9 +19,9 @@ export default async function AccountPage({ params }: PageProps<"/[locale]/accou
   const t = getDictionary(locale);
 
   return (
-    <div className="space-y-8">
+    <div className="container-page space-y-8 py-10 sm:py-14">
       <header className="space-y-3">
-        <h1 className="text-4xl font-semibold tracking-tight">{t.accountTitle}</h1>
+        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">{t.accountTitle}</h1>
         <p className="max-w-2xl text-lg text-muted">{t.accountLead}</p>
       </header>
       <Suspense>

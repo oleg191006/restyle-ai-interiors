@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExampleThumb } from "@/components/example-thumb";
-import { Palette } from "@/components/palette";
 import { getRooms, getStyle, getStyles } from "@/lib/data";
 import { exampleFor } from "@/lib/examples";
 import { alternatesFor, getDictionary, hasLocale, paths } from "@/lib/i18n";
@@ -33,7 +32,7 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
   const t = getDictionary(locale);
 
   return (
-    <div className="space-y-8">
+    <div className="container-page space-y-8 py-10 sm:py-14">
       <Breadcrumbs
         items={[
           { name: t.home, href: paths.home(locale) },
@@ -41,24 +40,31 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
           { name: style.name, href: paths.style(locale, slug) },
         ]}
       />
-      <header className="space-y-3">
-        <h1 className="text-4xl font-semibold tracking-tight">{style.name}</h1>
+      <header className="max-w-3xl space-y-3">
+        <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">{style.name}</h1>
         <p className="max-w-2xl text-lg text-muted">{style.summary}</p>
       </header>
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">{t.palette}</h2>
-        <Palette colors={style.palette} label={t.palette} />
+      <section className="max-w-xl space-y-4">
+        <h2 className="font-display text-2xl font-semibold sm:text-3xl">{t.palette}</h2>
+        <ul aria-label={t.palette} className="grid grid-cols-4 gap-3">
+          {style.palette.map((c) => (
+            <li key={c} className="space-y-2">
+              <span className="block aspect-square rounded-xl ring-1 ring-black/10" style={{ backgroundColor: c }} />
+              <code className="text-xs text-muted">{c}</code>
+            </li>
+          ))}
+        </ul>
       </section>
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">{t.styleIn}</h2>
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="space-y-5">
+        <h2 className="font-display text-2xl font-semibold sm:text-3xl">{t.styleIn}</h2>
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 sm:gap-x-6">
           {rooms.map((r) => {
             const example = exampleFor(r.slug, slug);
             return (
               <li key={r.slug}>
                 <Link
                   href={paths.idea(locale, r.slug, slug)}
-                  className="block h-full space-y-3 rounded-xl border border-line p-4 hover:border-accent"
+                  className="group block h-full space-y-3"
                 >
                   <ExampleThumb
                     src={example?.after}
@@ -66,7 +72,7 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
                     alt={`${r.name}: ${style.name}`}
                     sizes="(min-width: 1024px) 220px, (min-width: 640px) 25vw, 50vw"
                   />
-                  <span className="block">{r.name}</span>
+                  <span className="font-display block text-lg font-semibold group-hover:text-accent">{r.name}</span>
                 </Link>
               </li>
             );
