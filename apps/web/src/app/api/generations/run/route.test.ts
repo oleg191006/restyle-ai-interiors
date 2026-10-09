@@ -24,6 +24,9 @@ const { POST } = await import("./route");
 
 const job = (over: Record<string, unknown> = {}) => ({
   id: "g1",
+  createdAt: new Date(),
+  visitorId: "v1",
+  userId: null,
   status: "queued",
   attempts: 0,
   startedAt: null,
