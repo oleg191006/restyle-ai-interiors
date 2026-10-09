@@ -8,3 +8,5 @@ dist
 next-env.d.ts
 packages/db/src/generated
 .lighthouseci
+test-results
+playwright-report
