@@ -69,6 +69,19 @@ browser resize (≤ 504 px, drops EXIF) → presigned PUT to storage → POST /a
   (needs the Cloudflare variables in `.env.local`; ~110 neurons per image, ~1,750 per version;
   `--rooms=bathroom,kitchen` runs a subset).
 
+## Accounts and plans
+
+Email + password through Better Auth, sessions in Postgres (ADR 0010). Pages stay static: the
+account page and the tool read `GET /api/account` from the browser.
+
+| Plan | Generations per 24 h |
+| --- | --- |
+| Guest (visitor cookie) | 2 |
+| Free (signed in) | 5 |
+| Pro (subscription, next step) | 30 |
+
+Set `BETTER_AUTH_SECRET` in `.env.local` (any long random string locally).
+
 ## Before/after examples
 
 Each landing page shows a real redesign of its room in its style (ADR 0007), the unique content
@@ -89,6 +102,9 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 | `/[locale]/ideas/[room]` | static (all rooms) |
 | `/[locale]/styles/[style]` | static (all styles) |
 | `/[locale]/redesign` | static shell, client form; room and style preselected from the query |
+| `/[locale]/account` | static shell, client panel; `noindex` |
+| `/api/auth/*` | Better Auth (sign-up, sign-in, sign-out, session) |
+| `/api/account` | who is signed in, plan, used today |
 | `/[locale]/ideas/[room]/[style]` | top 40 per locale at build, rest on first visit then cached |
 | `/sitemap.xml`, `/robots.txt` | static, hreflang alternates in sitemap |
 | `/` | 307 to `/uk` or `/en` by `Accept-Language` (`src/proxy.ts`) |

@@ -103,7 +103,8 @@ First real runs with FLUX.2 [klein] 4B:
 
 ## Known gaps
 
-> Addressed by ADR 0008 (IP rate limiting on all public write endpoints).
+> Addressed by ADR 0008 (IP rate limiting on all public write endpoints). Per-person limits
+> now come from the plan: guest 2, Free 5, Pro 30 per day (ADR 0010).
 
 - **Per-visitor limits are cookie based**, so a client that drops cookies gets a fresh
   allowance. They stop honest overuse only. The global daily cap is what protects the AI
