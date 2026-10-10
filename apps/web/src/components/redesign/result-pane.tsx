@@ -3,6 +3,7 @@ import { button } from "@/components/ui/button";
 import { fill, type Dictionary } from "@/lib/i18n";
 import type { Result } from "./api";
 import type { Photo } from "./prepare-photo";
+import { ResultFeedback } from "./result-feedback";
 import type { Phase } from "./use-generation";
 
 /**
@@ -49,6 +50,7 @@ export function ResultPane({
               {t.toolAgain}
             </button>
           </div>
+          <ResultFeedback key={result.id} t={t} jobId={result.id} />
         </>
       ) : (
         <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-line bg-accent-soft">

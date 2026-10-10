@@ -1,3 +1,4 @@
+import type { Feedback } from "@/lib/feedback";
 import type { Locale } from "@/lib/i18n";
 
 /** The three API steps of a redesign as seen from the browser (ADR 0005, steps 1–6). */
@@ -5,7 +6,7 @@ import type { Locale } from "@/lib/i18n";
 const POLL_MS = 2000;
 const POLL_LIMIT = 90; // 3 minutes
 
-export type Result = { before: string; after: string };
+export type Result = { id: string; before: string; after: string };
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -38,9 +39,19 @@ export async function waitForResult(id: string, onStatus: (s: "queued" | "runnin
     if (cancelled()) return null;
     const res = await fetch(`/api/generations/${id}`, { cache: "no-store" });
     const g = (await res.json()) as { status: string; error: string | null; inputUrl: string; outputUrl: string | null };
-    if (g.status === "done" && g.outputUrl) return { before: g.inputUrl, after: g.outputUrl };
+    if (g.status === "done" && g.outputUrl) return { id, before: g.inputUrl, after: g.outputUrl };
     if (g.status === "failed") throw new Error(g.error ?? "failed");
     onStatus(g.status === "running" ? "running" : "queued");
   }
   throw new Error("timeout");
+}
+
+/** 👍 / 👎 on a finished job (ADR 0015). True when it was saved. */
+export async function sendFeedback(id: string, feedback: Feedback) {
+  const res = await fetch(`/api/generations/${id}/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(feedback),
+  });
+  return res.ok;
 }

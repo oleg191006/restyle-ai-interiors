@@ -37,6 +37,14 @@ test("a photo goes through upload, queue and worker and comes back redesigned", 
   // The fake provider returns 1024×768, like the real model.
   const output = await sharp(await (await request.get((await after.getAttribute("src"))!)).body()).metadata();
   expect([output.width, output.height]).toEqual([1024, 768]);
+
+  // 👎 is saved at once; the reason updates it (ADR 0015).
+  const saved = (body: string) =>
+    page.waitForResponse((r) => r.url().includes("/feedback") && r.request().postData() === body && r.status() === 200);
+  await Promise.all([saved('{"rating":"down","reason":null}'), page.getByRole("button", { name: "Not good" }).click()]);
+  await expect(page.getByRole("button", { name: "Not good" })).toHaveAttribute("aria-pressed", "true");
+  await Promise.all([saved('{"rating":"down","reason":"barely_changed"}'), page.getByRole("button", { name: "Barely changed" }).click()]);
+  await expect(page.getByText("Thank you! Your ratings help us improve the results.")).toBeVisible();
 });
 
 test("the worker refuses calls that are not signed by QStash", async ({ request }) => {
