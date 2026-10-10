@@ -19,12 +19,14 @@ rolled out by search demand.
   usage inside the free AI allowance, so overload degrades to a clear message, not a bill.
 - **Prompts chosen by measurement.** Seven prompt versions scored on a fixed photo set with a
   rubric, one variable at a time; production runs v4 because it invents the fewest windows.
+  Every result can be rated 👍 / 👎 with the rubric's reasons, so versions are also compared on
+  real photos (`pnpm feedback:report`).
 - **A full freemium funnel.** Guest → account → Pro, with limits from one entitlements module,
   Stripe subscriptions synced by idempotent webhooks, and a 50/50 trial-vs-no-trial experiment
   behind a PostHog flag. Analytics run server-side, so landing pages ship no tracking script.
-- **Tested end to end without spending AI quota.** 105 unit tests and 12 Playwright tests (real
+- **Tested end to end without spending AI quota.** 113 unit tests and 12 Playwright tests (real
   upload → queue → worker → result with a fake model, Stripe Checkout and portal, SEO tags).
-- **Decisions written down.** 14 ADRs, each with the measurements behind it.
+- **Decisions written down.** 15 ADRs, each with the measurements behind it.
 
 ## Architecture
 
@@ -102,6 +104,7 @@ sequenceDiagram
 | [0012](docs/adr/0012-product-analytics-and-paywall-experiment.md) | Server-side PostHog; the trial-vs-no-trial paywall experiment |
 | [0013](docs/adr/0013-editorial-redesign.md) | Editorial redesign kept inside the budget: LCP 3.0 → 2.3 s by finding what Lighthouse actually models |
 | [0014](docs/adr/0014-account-history.md) | Redesign history for accounts, limited to the 7 days photos are kept |
+| [0015](docs/adr/0015-result-feedback.md) | 👍 / 👎 on every result, stored next to the prompt version; down reasons match the eval rubric |
 
 ## Stack
 
@@ -151,6 +154,8 @@ Real-user Core Web Vitals are collected by `components/web-vitals.tsx` → `POST
 pnpm vitals:report        # p75 per page type, metric and device, last 28 days
 pnpm vitals:report 7      # last 7 days
 ```
+
+Ratings of real results per prompt version (ADR 0015): `pnpm feedback:report [days]`.
 
 ## Redesign tool
 
@@ -249,6 +254,7 @@ result with `"rejected": "<reason>"`; it is never shown and never regenerated.
 | `/api/account/generations` | the account's finished redesigns from the last 7 days, signed image URLs (ADR 0014) |
 | `/api/billing/checkout`, `/api/billing/portal` | Stripe Checkout and Customer Portal sessions |
 | `/api/stripe/webhook` | Stripe events, signature-verified, idempotent |
+| `/api/generations/:id/feedback` | 👍 / 👎 with an optional reason, owner only, finished jobs only (ADR 0015) |
 | `/api/events` | page-view beacon → PostHog |
 | `/[locale]/ideas/[room]/[style]` | top 40 per locale at build, rest on first visit then cached |
 | `/sitemap.xml`, `/robots.txt` | static, hreflang alternates in sitemap |
