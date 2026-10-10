@@ -35,10 +35,11 @@ export default async function StylesIndex({ params }: PageProps<"/[locale]/style
       />
       <PageHeader title={t.stylesTitle} lead={t.stylesLead} />
       <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        {styles.map((s) => (
+        {styles.map((s, i) => (
           <li key={s.slug}>
             <Link href={paths.style(locale, s.slug)} className="group block h-full space-y-3">
               <ExampleThumb
+                position={i}
                 src={exampleFor("living-room", s.slug)?.after}
                 palette={s.palette}
                 alt={s.name}

@@ -46,7 +46,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
       />
       <PageHeader title={fill(t.roomIdeas, { room: room.name })} lead={room.intro} />
       <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6">
-        {styles.map((s) => {
+        {styles.map((s, i) => {
           const example = exampleFor(slug, s.slug);
           return (
             <li key={s.slug}>
@@ -55,6 +55,7 @@ export default async function RoomHub({ params }: PageProps<"/[locale]/ideas/[ro
                 className="group block h-full space-y-3"
               >
                 <ExampleThumb
+                position={i}
                   src={example?.after}
                   palette={s.palette}
                   alt={`${room.name}: ${s.name}`}

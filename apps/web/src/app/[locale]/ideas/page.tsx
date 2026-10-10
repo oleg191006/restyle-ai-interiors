@@ -37,10 +37,11 @@ export default async function IdeasIndex({ params }: PageProps<"/[locale]/ideas"
       />
       <PageHeader title={t.ideasTitle} lead={t.ideasLead} />
       <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        {rooms.map((r) => (
+        {rooms.map((r, i) => (
           <li key={r.slug}>
             <Link href={paths.room(locale, r.slug)} className="group block h-full space-y-3">
               <ExampleThumb
+                position={i}
                 src={styles.map((s) => exampleFor(r.slug, s.slug)).find(Boolean)?.after}
                 alt={r.name}
                 sizes="(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw"

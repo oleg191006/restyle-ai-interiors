@@ -50,7 +50,7 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
       <section className="space-y-5">
         <h2 className="font-display text-2xl font-semibold sm:text-3xl">{t.styleIn}</h2>
         <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 sm:gap-x-6">
-          {rooms.map((r) => {
+          {rooms.map((r, i) => {
             const example = exampleFor(r.slug, slug);
             return (
               <li key={r.slug}>
@@ -59,6 +59,7 @@ export default async function StyleHub({ params }: PageProps<"/[locale]/styles/[
                   className="group block h-full space-y-3"
                 >
                   <ExampleThumb
+                position={i}
                     src={example?.after}
                     palette={style.palette}
                     alt={`${r.name}: ${style.name}`}
