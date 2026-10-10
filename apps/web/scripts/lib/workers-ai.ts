@@ -34,6 +34,6 @@ export async function runModel(prompt: string, image: Buffer | null, seed: numbe
 // Same pair, same seed everywhere, so eval results and published examples are reproducible.
 export const seedOf = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % 1_000_000;
 
-// Same preprocessing as the browser (components/redesign-tool.tsx): long side 504 px, JPEG.
+// Same preprocessing as the browser (components/redesign/prepare-photo.ts): long side 504 px, JPEG.
 export const toModelInput = (file: string) =>
   sharp(file).resize({ width: 504, height: 504, fit: "inside" }).jpeg({ quality: 90 }).toBuffer();
