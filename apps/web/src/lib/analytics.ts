@@ -12,6 +12,7 @@ export type FunnelEvent =
   | "generation_requested"
   | "generation_completed"
   | "generation_failed"
+  | "generation_rated"
   | "limit_reached"
   | "signed_up"
   | "signed_in"
