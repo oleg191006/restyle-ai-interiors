@@ -1,26 +1,84 @@
 {
-  "bathroom--japandi": {
-    "promptVersion": "v3",
-    "generatedAt": "2026-10-09",
+  "bathroom--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
     "rejected": "added a window to a windowless bathroom (invented architecture)"
+  },
+  "bathroom--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--classic": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a small window under the ceiling of a windowless bathroom (invented architecture)"
+  },
+  "bathroom--coastal": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--eclectic": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--farmhouse": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a small window under the ceiling of a windowless bathroom (invented architecture)"
+  },
+  "bathroom--japandi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a window and widened the room (invented architecture)"
+  },
+  "bathroom--loft": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "bathroom--minimalist": {
-    "promptVersion": "v3",
-    "generatedAt": "2026-10-09",
-    "rejected": "added a window to a windowless bathroom (invented architecture)"
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bathroom--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "bathroom--scandinavian": {
-    "promptVersion": "v3",
-    "generatedAt": "2026-10-09",
-    "rejected": "added a window to a windowless bathroom (invented architecture)"
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "barely changed: the blue tiles stay, only the vanity is new"
+  },
+  "bedroom--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "bedroom--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "bedroom--classic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "bedroom--coastal": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "bedroom--eclectic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "bedroom--farmhouse": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "bedroom--japandi": {
     "promptVersion": "v3",
@@ -30,6 +88,11 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "bedroom--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "barely changed: same bed, blanket and wardrobe, only the wall art is new"
+  },
   "bedroom--minimalist": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
@@ -38,17 +101,191 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "bedroom--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "bedroom--scandinavian": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "dining-room--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--classic": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--japandi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--loft": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--minimalist": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "dining-room--modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a door left of the window (invented architecture)"
+  },
+  "dining-room--scandinavian": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "replaced the mirror wall with a door (invented architecture)"
+  },
+  "hallway--japandi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--loft": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--minimalist": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "hallway--scandinavian": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--classic": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--coastal": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a door where the bookcase stood (invented architecture)"
+  },
+  "home-office--farmhouse": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a door on the left wall (invented architecture)"
+  },
+  "home-office--japandi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added two doors (invented architecture)"
+  },
+  "home-office--loft": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--minimalist": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "home-office--scandinavian": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--classic": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10",
+    "rejected": "added a door where the wardrobe stood (invented architecture)"
+  },
+  "kids-room--japandi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--loft": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--minimalist": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kids-room--scandinavian": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kitchen--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "kitchen--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "kitchen--classic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "kitchen--coastal": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "kitchen--eclectic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "kitchen--farmhouse": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "kitchen--japandi": {
     "promptVersion": "v3",
@@ -58,6 +295,10 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "kitchen--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "kitchen--minimalist": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
@@ -66,17 +307,37 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "kitchen--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "kitchen--scandinavian": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "living-room--art-deco": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "living-room--boho": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "living-room--classic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "living-room--coastal": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "living-room--eclectic": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "living-room--farmhouse": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   },
   "living-room--japandi": {
     "promptVersion": "v3",
@@ -86,6 +347,14 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "living-room--mediterranean": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
+  "living-room--mid-century-modern": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "living-room--minimalist": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
@@ -94,8 +363,16 @@
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
   },
+  "living-room--neoclassical": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
+  },
   "living-room--scandinavian": {
     "promptVersion": "v3",
     "generatedAt": "2026-10-09"
+  },
+  "living-room--wabi-sabi": {
+    "promptVersion": "v4",
+    "generatedAt": "2026-10-10"
   }
 }

@@ -3,10 +3,11 @@
 //
 //   pnpm --filter web examples:generate            # up to 20 new images
 //   pnpm --filter web examples:generate --limit 60
+//   pnpm --filter web examples:generate --retry-rejected   # also redo pairs rejected under an older prompt
 //
 // Incremental and resumable: pairs go in order of search demand (room × style priority),
 // existing ones are skipped, and the production prompt's eval results are reused for free.
-// ~160 neurons per new image, from the same daily allowance as production.
+// ~110 neurons per new image (measured), from the same daily allowance as production.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -24,12 +25,13 @@ const manifestPath = path.join(import.meta.dirname, "..", "src", "data", "exampl
 
 // Rooms whose examples fail review for a known prompt problem; skipped until it is fixed,
 // so the generator does not spend the allowance on images that will be rejected.
-const HOLD_ROOMS: Record<string, string> = {
-  bathroom: "v3 adds a window to the windowless bathroom photo (3 of 3 rejected); add it to the eval set first",
-};
+// Bathroom was held under v3 (a window added in 3 of 3); v4 invents one in 1 of 4 (ADR 0006).
+const HOLD_ROOMS: Record<string, string> = {};
 
 const limitArg = process.argv.indexOf("--limit");
 const limit = limitArg > 0 ? Number(process.argv[limitArg + 1]) : 20;
+// A pair rejected under an older prompt may pass under the current one.
+const retryRejected = process.argv.includes("--retry-rejected");
 
 // 1024×768 WebP at q78 is ~60–90 KB; next/image serves smaller AVIF/WebP variants from it.
 const publish = (input: Buffer | string, file: string) =>
@@ -47,7 +49,11 @@ fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
 const pairs = rooms
   .flatMap((r) => styles.map((s) => ({ room: r.slug, style: s.slug, score: r.priority * s.priority })))
   .sort((a, b) => b.score - a.score)
-  .filter(({ room, style }) => !manifest[`${room}--${style}`] && !HOLD_ROOMS[room]);
+  .filter(({ room, style }) => {
+    const entry = manifest[`${room}--${style}`];
+    const retry = retryRejected && entry?.rejected && entry.promptVersion !== currentPromptVersion;
+    return (!entry || retry) && !HOLD_ROOMS[room];
+  });
 
 for (const [room, why] of Object.entries(HOLD_ROOMS)) console.log(`on hold: ${room} (${why})`);
 
