@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPrompt, currentPromptVersion, prompts } from "./prompt";
+import { buildPrompt, currentPromptVersion, prompts, V7_SENTENCE } from "./prompt";
 
 const input = { room: "Bathroom", style: "Japandi", materials: ["oak", "linen"], palette: ["warm white", "sand"] };
 
@@ -40,6 +40,12 @@ describe("prompts", () => {
     const [a, b] = [prompts.v4(input).split(" "), prompts.v6(input).split(" ")];
     expect(b.length).toBe(a.length + 1);
     expect(prompts.v6(input).replace("the same wall positions", "the same walls")).toBe(prompts.v4(input));
+  });
+
+  it("v7 is v4 with only one sentence added", () => {
+    const v7 = prompts.v7(input);
+    expect(v7).toContain(V7_SENTENCE);
+    expect(v7.replace(` ${V7_SENTENCE}`, "")).toBe(prompts.v4(input));
   });
 
   it("buildPrompt uses the production version", () => {

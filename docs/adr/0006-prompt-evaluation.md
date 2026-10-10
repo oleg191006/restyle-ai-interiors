@@ -98,6 +98,45 @@ architecture against unchanged rooms. Two further notes:
   else (a unit test enforces that). Next quota day: `eval:prompts v6 --rooms=bathroom,kitchen`
   (~870 neurons), then the other rooms only if it holds.
 
+## Follow-up: v6, one variable
+
+v6 is v4 with one edit, "the same walls" → "the same wall positions" (a unit test checks that
+nothing else differs). Bathroom and kitchen, 8 images, same photos and seeds, scored beside v4:
+
+| Room | v4 | v6 | Note |
+| --- | --- | --- | --- |
+| bathroom (no window) | 17 / 20, 1 small transom | **14 / 20, 3 invented windows** | Scandinavian: high small window, tiles and fixtures unchanged; loft and eclectic: full windows |
+| kitchen | 16 / 20 | 16 / 20 | Scandinavian still keeps cabinets and tablecloth; classic and eclectic keep the cabinets |
+
+**v6 is rejected**, and unlike v5 the result is attributable: that one phrase is what holds
+invented windows back (1 → 3), and loosening it does not make the Scandinavian kitchen change
+(16 → 16). The "barely changed" Scandinavian results are therefore not caused by "the same
+walls"; the original kitchen and bathroom are already close to the style, which is at least
+partly the rubric's problem (see v5 notes).
+
+That leaves v3 against v4: the same total (70 / 80), but v4 invents one window in four
+windowless bathrooms where v3 invents four. By this ADR's own rule, architecture errors decide.
+**Decision: production moves to v4** (`currentPromptVersion`). Every job stores its
+`promptVersion`, so real jobs can confirm it. The published examples stay as they are: each was
+reviewed by eye, and the ones with invented windows were already rejected (ADR 0007).
+
+## Follow-up: v7, the "already fits" sentence
+
+v7 is v4 plus one sentence: "Even pieces that already look close to the new style are
+replaced with new ones." Same 8 pairs and seeds:
+
+| Room | v4 | v7 | Note |
+| --- | --- | --- | --- |
+| bathroom | 17 / 20, 1 window | 17 / 20, 1 window (classic) | Scandinavian swaps the vanity but keeps the blue tiles |
+| kitchen | 16 / 20 | 16 / 20 | Scandinavian still keeps cabinets; eclectic better (new fronts), classic worse (cabinets kept) |
+
+**No effect, so v7 is not adopted.** The one target, the Scandinavian kitchen, did not change;
+the eclectic/classic swap is the size of the noise with one seed per pair. Three phrasings
+(v4, v6, v7) now leave that kitchen alike: the model keeps what already matches, and more
+prompt text does not override the photo. Further work there is not wording but either the
+model's parameters (guidance, steps) or the rubric: a Scandinavian redesign of an
+almost-Scandinavian kitchen may rightly look close to it. Production stays on v4.
+
 ## Consequences
 
 - Any prompt change goes through the eval and is recorded here with its scores.

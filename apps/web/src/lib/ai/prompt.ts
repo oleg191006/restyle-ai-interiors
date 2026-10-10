@@ -121,14 +121,33 @@ export function promptV5({ room, style, materials, palette }: PromptInput) {
  * result says nothing about any single change. v6 is v4 with exactly one edit: "the same
  * walls" → "the same wall positions". "Exactly as it is in the photo", which likely holds the
  * windows back, stays.
+ * Eval: rejected. Windows came back in 3 of 4 bathrooms (v4: 1) and the kitchen scored the same
+ * as v4 (16 / 20; the Scandinavian one still keeps its cabinets). So "the same walls" alone is
+ * what holds the windows back, and it is not why the Scandinavian kitchen barely changes.
  */
 export function promptV6(input: PromptInput) {
   return promptV4(input).replace("the same walls, ceiling", "the same wall positions, ceiling");
 }
 
-export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4, v5: promptV5, v6: promptV6 } as const;
+/**
+ * v7: v6 showed that "the same walls" holds invented windows back and is not why Scandinavian
+ * rooms barely change: their original photos already look close to the style, and the model
+ * keeps what already fits. v7 is v4 plus one sentence saying that such pieces are replaced too.
+ * Eval: no effect. Same scores as v4 (bathroom 17, 1 window; kitchen 16), and the Scandinavian
+ * kitchen still keeps its cabinets. The eclectic kitchen got better and the classic one worse,
+ * which with one seed per pair is noise. Text does not move it; production stays on v4.
+ */
+export const V7_SENTENCE = "Even pieces that already look close to the new style are replaced with new ones.";
+export function promptV7(input: PromptInput) {
+  return promptV4(input).replace("Nothing from the original furnishing may remain.", `Nothing from the original furnishing may remain. ${V7_SENTENCE}`);
+}
+
+export const prompts = { v1: promptV1, v2: promptV2, v3: promptV3, v4: promptV4, v5: promptV5, v6: promptV6, v7: promptV7 } as const;
 export type PromptVersion = keyof typeof prompts;
 
-/** The version used in production. Change only after it wins on the eval set. */
-export const currentPromptVersion: PromptVersion = "v3";
+/**
+ * The version used in production. Change only after it wins on the eval set.
+ * v4: ties v3 on score but invents 1 window in 4 windowless bathrooms against v3's 4 (ADR 0006).
+ */
+export const currentPromptVersion: PromptVersion = "v4";
 export const buildPrompt = (input: PromptInput) => prompts[currentPromptVersion](input);
