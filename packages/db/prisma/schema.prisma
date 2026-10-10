@@ -118,6 +118,21 @@ enum GenerationStatus {
 }
 
 /// One photo redesign job (ADR 0005). Created as `queued`, processed by the QStash worker.
+/// 👍 / 👎 under a finished redesign
+enum Rating {
+  up
+  down
+}
+
+/// Why a result was rated down. The first two are the prompt eval's architecture and
+/// "barely changed" criteria (ADR 0006), so real jobs speak the same language as the eval.
+enum RatingReason {
+  invented_architecture
+  barely_changed
+  wrong_style
+  poor_quality
+}
+
 model Generation {
   id          String           @id @default(cuid())
   createdAt   DateTime         @default(now())
@@ -136,6 +151,10 @@ model Generation {
   provider    String
   /// Prompt version from apps/web/src/lib/ai/prompt.ts, to compare versions on real jobs
   promptVersion String?
+  /// The person's verdict on the result, with a reason when it is "down" (ADR 0015)
+  rating        Rating?
+  ratingReason  RatingReason?
+  ratedAt       DateTime?
   attempts    Int              @default(0)
   error       String?
   startedAt   DateTime?

@@ -11,6 +11,7 @@
     "db:seed": "pnpm --filter @restyle/db seed",
     "lhci": "lhci autorun",
     "vitals:report": "pnpm --filter @restyle/db vitals:report",
+    "feedback:report": "pnpm --filter @restyle/db feedback:report",
     "qstash:dev": "npx @upstash/qstash-cli@2.40.12 dev -port 8180"
   },
   "devDependencies": {

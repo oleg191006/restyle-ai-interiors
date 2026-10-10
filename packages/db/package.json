@@ -12,7 +12,8 @@
     "migrate": "prisma migrate dev",
     "seed": "tsx src/seed.ts",
     "postinstall": "prisma generate",
-    "vitals:report": "tsx src/vitals-report.ts"
+    "vitals:report": "tsx src/vitals-report.ts",
+    "feedback:report": "tsx src/feedback-report.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
