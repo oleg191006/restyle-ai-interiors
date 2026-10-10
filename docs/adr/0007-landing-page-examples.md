@@ -41,6 +41,30 @@ could not catch it. Bathrooms are on hold in the generator (`HOLD_ROOMS`) until 
 room is in the eval set and a prompt passes it. Real visitors with such a bathroom hit the
 same problem today.
 
+## Second batch: v4 and five more rooms (2026-10-10)
+
+With production on prompt v4 (ADR 0006: one invented window in four windowless bathrooms
+against v3's four), bathrooms came off hold. The generator gained `--retry-rejected`, which
+regenerates pairs rejected under an older prompt version, and reuses the v4 eval images for
+free. 40 new images plus 4 reused and 3 new "before" photos (home office, kids' room, dining
+room), about 5,000 neurons.
+
+Every image was reviewed by eye with the same criteria as the eval rubric:
+
+| Rejected | Why |
+| --- | --- |
+| bathroom × art deco, classic, japandi | a window in a windowless bathroom (japandi also widened the room) |
+| home office × japandi, dining room × modern | invented doors |
+| bathroom × Scandinavian, bedroom × mid-century | barely changed (same tiles; same bed, blanket and wardrobe) |
+
+7 of 44 rejected (16%), 5 of them invented architecture. Published: **58 of 120** pairs
+(21 before), every room but the hallway. v4 still invents windows in the windowless bathroom
+(3 of 11), so review stays mandatory; the eval's "1 of 4" was a small sample.
+
+Kids' room results keep the architecture but lose the child's character: toys and the bright
+bed go, and the room reads as an adult bedroom. Not a rejection reason by the rubric, but the
+next prompt candidate: room-specific furnishing for "kids' room".
+
 ## Performance
 
 `next/image` with explicit width and height keeps CLS at 0.
@@ -70,6 +94,29 @@ checks every metric of one representative run, and on the unchanged room hub it 
 run with LCP 2549 ms while the median LCP was 1677 ms. `lighthouserc.json` now uses
 `aggregationMethod: "median"` (the median of each metric) over 5 runs instead of 3. With that,
 all six pages pass: performance 96–99, LCP 1956–2245 ms.
+
+Third batch, same day: 26 images and the hallway's "before" photo (~3,000 neurons). 5 rejected,
+all for invented architecture: a window in the bathroom (farmhouse) and doors in the hallway
+(boho), home office (coastal, farmhouse) and kids' room (classic). Published: **79 of 120**,
+every room covered, the living room complete. The home office now has invented doors in 3 of
+11 styles: its "before" photo is a tight corner with a bookcase at the frame's edge, which the
+model tends to turn into a door. A wider "before" photo is the cheaper fix to try first.
+
+### Hubs after the second batch
+
+More examples put more photos on the hubs: the living-room hub went from 7 to 13 lazy images and
+its lab LCP from ~2.4 to **3.03 s**. The LCP element is the first card's image, which waited
+~350 ms for the markup and then shared the throttled line with 12 other images and the scripts.
+`ExampleThumb` now takes the card's `position`:
+
+| Step (living-room hub, 5 runs, mobile) | LCP median | Images requested |
+| --- | --- | --- |
+| 13 lazy images | 3031 ms | 13 |
+| below the first row via `NearViewport` | 2591 ms | 6 |
+| + first image preloaded at high priority | **2422 ms** | 6 |
+
+The same fix as the home page (ADR 0013): images below the first row mount only near the
+viewport, and the one LCP image is preloaded rather than left to compete.
 
 ## Consequences
 
